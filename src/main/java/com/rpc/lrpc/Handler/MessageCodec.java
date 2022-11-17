@@ -1,14 +1,18 @@
 package com.rpc.lrpc.Handler;
 
+import com.rpc.lrpc.Enums.MessageType;
 import com.rpc.lrpc.Exception.IncorrectMagicNumberException;
 import com.rpc.lrpc.Util.MessageUtil;
 import com.rpc.lrpc.message.DefaultMessage;
+import com.rpc.lrpc.message.Message;
+import com.rpc.lrpc.net.RequestWaitingSet;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageCodec;
 import io.netty.handler.codec.MessageToMessageCodec;
 import io.netty.handler.codec.MessageToMessageDecoder;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -16,6 +20,9 @@ import java.util.List;
 @Component
 public class MessageCodec extends MessageToMessageCodec<ByteBuf,DefaultMessage> {
 
+
+    @Autowired
+    RequestWaitingSet requestWaitingSet;
 
 
     @Override
@@ -26,7 +33,11 @@ public class MessageCodec extends MessageToMessageCodec<ByteBuf,DefaultMessage> 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf msg, List<Object> out) throws Exception {
         try {
-            out.add(MessageUtil.byteToMessage(msg));
+            Message message = MessageUtil.byteToMessage(msg);
+            if (MessageType.response.equals(message.getMessageType())) {
+                requestWaitingSet.removeWaitingRequest(message.getSeq());
+            }
+            out.add(message);
         } catch (IncorrectMagicNumberException e) {
             throw new RuntimeException(e);
         }
