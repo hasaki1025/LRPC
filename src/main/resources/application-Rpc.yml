@@ -2,6 +2,9 @@ RPC:
   Provider:
     port:
     ServiceName:
+  Server:
+    Host:
+    port:
 
 
 

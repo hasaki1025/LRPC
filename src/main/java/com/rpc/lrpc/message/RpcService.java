@@ -6,5 +6,13 @@ import lombok.Data;
 @Data
 public class RpcService {
     String serviceName;
-    RpcMapping[] rpcMappings;
+    RpcController[] controllers;
+
+    public RpcService(String serviceName, RpcController[] controllers) {
+        this.serviceName = serviceName;
+        this.controllers = controllers;
+    }
+
+    public RpcService() {
+    }
 }
