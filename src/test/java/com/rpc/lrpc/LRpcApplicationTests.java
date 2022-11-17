@@ -10,6 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ConfigurableApplicationContext;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 @SpringBootTest
 class LRpcApplicationTests {
 
@@ -17,11 +20,9 @@ class LRpcApplicationTests {
     @Autowired
     ConfigurableApplicationContext context;
     @Test
-    void contextLoads() {
-        System.out.println(context.getBean(RpcConsumer.class));
-        System.out.println(context.getBean(RpcRegister.class));
-        System.out.println(context.getBean(RPCServiceProvider.class));
-        System.out.println(context.getBean(RpcServiceBeanPostProcessor.class));
+    void contextLoads() throws UnknownHostException {
+
+        System.out.println(InetAddress.getLocalHost());
     }
 
 }

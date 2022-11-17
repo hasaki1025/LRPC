@@ -15,10 +15,11 @@ import java.lang.reflect.Method;
 import java.util.HashSet;
 
 @Data
+@ConditionalOnBean(RPCServiceProvider.class)
 @Component
 public class RpcServiceBeanPostProcessor implements BeanPostProcessor {
     @Autowired
-    RPCServiceRProviderContext context;
+    RPCServiceProvider provider;
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
         if (bean.getClass().isAnnotationPresent(RPCController.class))
@@ -34,9 +35,9 @@ public class RpcServiceBeanPostProcessor implements BeanPostProcessor {
             }
             controller.setBeanClass(bean.getClass());
             controller.setBeanName(beanName);
-            controller.setServiceName(context.getServiceName());
+            controller.setServiceName(provider.getServiceName());
             controller.setRpcMappings(mappings.toArray(new RpcMapping[0]));
-            context.getMappings().addAll(mappings);
+            provider.addMapping(mappings);
             return controller;
         }
         return bean;

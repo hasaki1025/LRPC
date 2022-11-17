@@ -9,24 +9,24 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 import java.util.function.Function;
 
 
 @Data
+@ConditionalOnProperty(name={"RPC.Provider.ServiceName","RPC.Provider.port","RPC.Server.Host","RPC.Server.port"})
+@Component
 public class RPCServiceRProviderContext implements RPCServiceProvider{
     @Value("${RPC.Provider.ServiceName}")
-    final String serviceName;
+     String serviceName;
     @Value("${RPC.Provider.port}")
-    final int port;
+     int port;
     @Value("${RPC.Server.Host}")
-    final String registerServerHost;
+     String registerServerHost;
     @Value("${RPC.Server.port}")
-    final int registerServerPort;
+     int registerServerPort;
     @Autowired
     ConfigurableApplicationContext applicationContext;
 
@@ -35,7 +35,7 @@ public class RPCServiceRProviderContext implements RPCServiceProvider{
 
     private final HashSet<RpcController> rpcControllers=new HashSet<>();
 
-
+    @Override
     public RpcService getRpcService()
     {
         //保证要在容器初始化完成后再调用getRpcService
@@ -45,7 +45,7 @@ public class RPCServiceRProviderContext implements RPCServiceProvider{
        }
        return rpcService;
     }
-
+    @Override
     public void init()
     {
         ArrayList<RpcController> list = new ArrayList<>();
@@ -59,6 +59,13 @@ public class RPCServiceRProviderContext implements RPCServiceProvider{
         rpcService=new RpcService(serviceName,rpcControllers.toArray(new RpcController[0]));
     }
 
-
-
+    @Override
+    public void addMapping(Collection<RpcMapping> rpcMappings)
+    {
+        mappings.addAll(rpcMappings);
+    }
+    @Override
+    public RpcMapping[] getMappings() {
+        return mappings.toArray(new RpcMapping[0]);
+    }
 }

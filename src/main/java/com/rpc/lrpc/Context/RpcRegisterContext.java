@@ -4,16 +4,22 @@ import com.rpc.lrpc.message.RpcService;
 import com.rpc.lrpc.message.RpcURL;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Component;
 
 import java.util.*;
 
 @Data
+@ConditionalOnProperty(name = {
+        "RPC.Register.port"
+})
+@Component
 public class RpcRegisterContext implements RpcRegister {
      final Map<String,RpcService> rpcServiceMap=new HashMap<>();
      final Set<RpcURL> rpcURLS=new HashSet<>();
 
      @Value("${RPC.Register.port}")
-     final Integer port;
+      Integer port;
 
     @Override
     public RpcService[] getRpcServices() {

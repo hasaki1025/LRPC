@@ -4,16 +4,22 @@ import com.rpc.lrpc.message.RpcService;
 import com.rpc.lrpc.message.RpcURL;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.stream.Collectors;
 @Data
+@ConditionalOnProperty(name = {
+        "RPC.Server.port","RPC.Server.Host"
+})
+@Component
 public class RpcConsumerContext implements RpcConsumer {
 
     @Value("${RPC.Server.Host}")
-    final String registerServerHost;
+     String registerServerHost;
     @Value("${RPC.Server.port}")
-    final Integer registerServerPort;
+     Integer registerServerPort;
 
      final Map<String,RpcService> serviceMap=new HashMap<>();
      final Set<RpcURL> urls=new HashSet<>();
