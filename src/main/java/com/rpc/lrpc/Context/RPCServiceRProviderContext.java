@@ -13,6 +13,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 
 @Data
@@ -31,6 +33,8 @@ public class RPCServiceRProviderContext implements RPCServiceProvider{
     ConfigurableApplicationContext applicationContext;
 
     final HashSet<RpcMapping> mappings=new HashSet<>();
+
+    final Map<String,RpcMapping> mappingMap=new HashMap<>();
     private RpcService rpcService;
 
     private final HashSet<RpcController> rpcControllers=new HashSet<>();
@@ -52,7 +56,14 @@ public class RPCServiceRProviderContext implements RPCServiceProvider{
         for (String s : applicationContext.getBeanNamesForAnnotation(RPCController.class)) {
             Object bean = applicationContext.getBean(s);
             RpcController controller = new RpcController(bean.getClass(), serviceName, s);
-            mappings.addAll(List.of(controller.getRpcMappings()));
+
+            List<RpcMapping> rpcMappings = List.of(controller.getRpcMappings());
+
+            Map<String, RpcMapping> rpcMappingMap =
+                    rpcMappings.stream().collect(Collectors.toMap(RpcMapping::getMapping, Function.identity()));
+            mappingMap.putAll(rpcMappingMap);
+
+            mappings.addAll(rpcMappings);
             list.add(controller);
         }
         rpcControllers.addAll(list);
@@ -63,7 +74,16 @@ public class RPCServiceRProviderContext implements RPCServiceProvider{
     public void addMapping(Collection<RpcMapping> rpcMappings)
     {
         mappings.addAll(rpcMappings);
+        Map<String, RpcMapping> map =
+                rpcMappings.stream().collect(Collectors.toMap(RpcMapping::getMapping, Function.identity()));
+        mappingMap.putAll(map);
     }
+
+    @Override
+    public RpcMapping getMapping(String mapping) {
+        return mappingMap.get(mapping);
+    }
+
     @Override
     public RpcMapping[] getMappings() {
         return mappings.toArray(new RpcMapping[0]);

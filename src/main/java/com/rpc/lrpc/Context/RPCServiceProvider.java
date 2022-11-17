@@ -21,4 +21,6 @@ public interface RPCServiceProvider {
     RpcMapping[] getMappings();
 
     void addMapping(Collection<RpcMapping> rpcMappings);
+
+    RpcMapping getMapping(String mapping);
 }

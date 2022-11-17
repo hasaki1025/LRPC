@@ -5,7 +5,6 @@ import com.rpc.lrpc.Exception.IncorrectMagicNumberException;
 import com.rpc.lrpc.Util.MessageUtil;
 import com.rpc.lrpc.message.DefaultMessage;
 import com.rpc.lrpc.message.Message;
-import com.rpc.lrpc.net.RequestWaitingSet;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -21,8 +20,6 @@ import java.util.List;
 public class MessageCodec extends MessageToMessageCodec<ByteBuf,DefaultMessage> {
 
 
-    @Autowired
-    RequestWaitingSet requestWaitingSet;
 
 
     @Override
@@ -34,9 +31,6 @@ public class MessageCodec extends MessageToMessageCodec<ByteBuf,DefaultMessage> 
     protected void decode(ChannelHandlerContext ctx, ByteBuf msg, List<Object> out) throws Exception {
         try {
             Message message = MessageUtil.byteToMessage(msg);
-            if (MessageType.response.equals(message.getMessageType())) {
-                requestWaitingSet.removeWaitingRequest(message.getSeq());
-            }
             out.add(message);
         } catch (IncorrectMagicNumberException e) {
             throw new RuntimeException(e);

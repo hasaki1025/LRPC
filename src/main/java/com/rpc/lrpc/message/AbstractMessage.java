@@ -26,4 +26,14 @@ public abstract class AbstractMessage implements Message{
     }
 
 
+
+    public AbstractMessage(String magicNumber, int version, SerializableType serializableType, CommandType commandType, int size, int seq, MessageType messageType) {
+        this.magicNumber = magicNumber;
+        this.version = version;
+        this.serializableType = serializableType;
+        this.commandType = commandType;
+        this.size = size;
+        this.seq = seq;
+        this.messageType = messageType;
+    }
 }

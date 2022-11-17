@@ -11,6 +11,11 @@ public class RpcMapping {
     Class<?> returnType;
     Class<?>[] paramType;
 
+    Class<?> clazz;
+    String name;
+
+    Method source;
+
 
     public RpcMapping(Method method) {
         if (method.isAnnotationPresent(RPCMapping.class))
@@ -18,6 +23,9 @@ public class RpcMapping {
             mapping=method.getAnnotation(RPCMapping.class).value();
             returnType=method.getReturnType();
             paramType=method.getParameterTypes();
+            clazz=method.getDeclaringClass();
+            name=method.getName();
+            source=method;
         }
         else {
             throw new RuntimeException();

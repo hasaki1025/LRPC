@@ -3,9 +3,11 @@ package com.rpc.lrpc.message.Content.Response;
 import lombok.Data;
 
 @Data
-public class DeafaultCallServicesResponse implements CallServicesResponse{
+public class DefaultCallServicesResponse implements CallServicesResponse{
 
     Exception exception;
+
+    Object result;
 
     @Override
     public boolean hasException() {
