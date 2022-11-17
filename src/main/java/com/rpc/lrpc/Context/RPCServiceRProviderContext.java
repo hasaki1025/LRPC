@@ -1,13 +1,20 @@
 package com.rpc.lrpc.Context;
 
+import com.rpc.lrpc.Annotation.RPCController;
 import com.rpc.lrpc.message.RpcController;
 import com.rpc.lrpc.message.RpcMapping;
 import com.rpc.lrpc.message.RpcService;
 import lombok.Data;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.ConfigurableApplicationContext;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
+import java.util.function.Function;
 
 
 @Data
@@ -20,6 +27,8 @@ public class RPCServiceRProviderContext implements RPCServiceProvider{
     final String registerServerHost;
     @Value("${RPC.Server.port}")
     final int registerServerPort;
+    @Autowired
+    ConfigurableApplicationContext applicationContext;
 
     final HashSet<RpcMapping> mappings=new HashSet<>();
     private RpcService rpcService;
@@ -36,5 +45,20 @@ public class RPCServiceRProviderContext implements RPCServiceProvider{
        }
        return rpcService;
     }
+
+    public void init()
+    {
+        ArrayList<RpcController> list = new ArrayList<>();
+        for (String s : applicationContext.getBeanNamesForAnnotation(RPCController.class)) {
+            Object bean = applicationContext.getBean(s);
+            RpcController controller = new RpcController(bean.getClass(), serviceName, s);
+            mappings.addAll(List.of(controller.getRpcMappings()));
+            list.add(controller);
+        }
+        rpcControllers.addAll(list);
+        rpcService=new RpcService(serviceName,rpcControllers.toArray(new RpcController[0]));
+    }
+
+
 
 }

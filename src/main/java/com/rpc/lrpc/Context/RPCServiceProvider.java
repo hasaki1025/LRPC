@@ -7,6 +7,7 @@ public interface RPCServiceProvider {
     String getServiceName();
     int getPort();
     RpcService getRpcService();
+    void init();
 
 
 }

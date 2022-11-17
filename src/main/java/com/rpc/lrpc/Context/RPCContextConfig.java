@@ -1,16 +1,24 @@
 package com.rpc.lrpc.Context;
 
+import com.rpc.lrpc.Annotation.RPCController;
+import com.rpc.lrpc.message.RpcService;
+import com.rpc.lrpc.message.RpcURL;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 @Configuration
-public class RPCContextConfig {
+public class RPCContextConfig implements ApplicationRunner {
 
 
     @Autowired
@@ -48,4 +56,19 @@ public class RPCContextConfig {
         return new RpcRegisterContext(Integer.parseInt(Objects.requireNonNull(environment.getProperty("RPC.Register.port"))));
     }
 
+    @Autowired(required = false)
+    RPCServiceProvider rpcServiceProvider;
+    @Autowired(required = false)
+    RpcRegister rpcRegister;
+    @Autowired(required = false)
+    RpcConsumer rpcConsumer;
+    @Autowired
+    ConfigurableApplicationContext applicationContext;
+    @Override
+    //TODO 注册中心开始监听注册请求
+    //TODO 消费者拉取服务列表
+    //TODO 服务提供者从容器中获取并注册服务
+    public void run(ApplicationArguments args) throws Exception {
+
+    }
 }
