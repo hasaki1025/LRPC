@@ -5,22 +5,23 @@ import com.rpc.lrpc.message.RpcMapping;
 import com.rpc.lrpc.message.RpcService;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 import java.util.HashSet;
 
 
 @Data
 public class RPCServiceRProviderContext implements RPCServiceProvider{
-    @Value("${RPC.Provider.ServiceName:null}")
-    String serviceName;
-    @Value("${RPC.Provider.port:null}")
-    Integer port;
+    @Value("${RPC.Provider.ServiceName}")
+    final String serviceName;
+    @Value("${RPC.Provider.port}")
+    final int port;
     @Value("${RPC.Server.Host}")
-    String registerServerHost;
+    final String registerServerHost;
     @Value("${RPC.Server.port}")
-    Integer registerServerPort;
+    final int registerServerPort;
 
-    HashSet<RpcMapping> mappings=new HashSet<>();
+    final HashSet<RpcMapping> mappings=new HashSet<>();
     private RpcService rpcService;
 
     private final HashSet<RpcController> rpcControllers=new HashSet<>();
@@ -34,18 +35,6 @@ public class RPCServiceRProviderContext implements RPCServiceProvider{
            rpcService=new RpcService(serviceName,rpcControllers.toArray(new RpcController[0]));
        }
        return rpcService;
-    }
-
-    @Override
-    //TODO 向注册中心注册服务
-    public void registerService() {
-
-    }
-
-    @Override
-    //TODO 向Server发送心跳
-    public void dokidoki() {
-
     }
 
 }

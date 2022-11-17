@@ -1,10 +1,12 @@
 RPC:
   Provider:
-    port:
-    ServiceName:
+    port: 8080
+    ServiceName: nihao
   Server:
-    Host:
-    port:
+    Host: 127.0.0.1
+    port: 80
+  Register:
+    port: 80
 
 
 

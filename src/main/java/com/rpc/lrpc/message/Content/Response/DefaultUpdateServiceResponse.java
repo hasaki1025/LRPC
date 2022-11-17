@@ -1,15 +1,33 @@
 package com.rpc.lrpc.message.Content.Response;
 
+import com.rpc.lrpc.message.RpcService;
 import com.rpc.lrpc.message.RpcURL;
 import lombok.Data;
 
 @Data
 public class DefaultUpdateServiceResponse implements UpdateServiceResponse {
-    RpcURL[] service;
-    String serviceName;
+
+    Exception e;
+
+    RpcService rpcService;
+    RpcURL[] rpcURLS;
+    @Override
+    public boolean hasException() {
+        return e!=null;
+    }
 
     @Override
-    public Object getValue() {
-        return service;
+    public Exception getException() {
+        return e;
+    }
+
+    @Override
+    public RpcURL[] getService() {
+        return rpcURLS;
+    }
+
+    @Override
+    public RpcService getServiceName() {
+        return rpcService;
     }
 }

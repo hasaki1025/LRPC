@@ -4,10 +4,16 @@ import lombok.Data;
 
 @Data
 public class DeafaultCallServicesResponse implements CallServicesResponse{
-    Object returnValue;
+
+    Exception exception;
 
     @Override
-    public Object getValue() {
-        return returnValue;
+    public boolean hasException() {
+        return exception!=null;
+    }
+
+    @Override
+    public Exception getException() {
+        return exception;
     }
 }

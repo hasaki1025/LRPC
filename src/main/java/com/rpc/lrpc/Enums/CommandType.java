@@ -4,14 +4,15 @@ import com.rpc.lrpc.message.Content.Request.*;
 
 public enum CommandType {
 
-    Call(0),Register(1),Pull(2),Update(3),DokiDoki(4);
+    Call(0),Register(1),Pull(2),Update(3),DokiDoki(4),Push(5);
 
-    public static Class<?>[] requestTypeClass={
+    public static final Class<?>[] requestTypeClass={
             DefaultCallServicesRequest.class,
             DefaultRegisterRequest.class,
             DefaultPullServicesRequest.class,
             UpdateServiceRequest.class,
-            DokiDokiRequest.class
+            DokiDokiRequest.class,
+            DefaultPushServicesRequest.class
     };
 
     private int value;
@@ -24,7 +25,7 @@ public enum CommandType {
         return value;
     }
 
-    private final static CommandType[] commandTypes={Call,Register,Pull,Update,DokiDoki};
+    private final static CommandType[] commandTypes={Call,Register,Pull,Update,DokiDoki,Push};
 
     public static CommandType forInt(int i)
     {

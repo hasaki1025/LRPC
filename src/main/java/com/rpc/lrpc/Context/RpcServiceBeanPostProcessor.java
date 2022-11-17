@@ -15,7 +15,6 @@ import java.lang.reflect.Method;
 import java.util.HashSet;
 
 @Data
-@ConditionalOnBean(RPCServiceRProviderContext.class)
 @Component
 public class RpcServiceBeanPostProcessor implements BeanPostProcessor {
     @Autowired

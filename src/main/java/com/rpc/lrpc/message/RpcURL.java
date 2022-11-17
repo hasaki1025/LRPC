@@ -6,5 +6,5 @@ import lombok.Data;
 public class RpcURL {
     String host;
     String port;
-    RpcService rpcService;
+    String serviceName;
 }

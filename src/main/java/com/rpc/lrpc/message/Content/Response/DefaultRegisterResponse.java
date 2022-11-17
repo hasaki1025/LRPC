@@ -4,10 +4,16 @@ import lombok.Data;
 
 @Data
 public class DefaultRegisterResponse implements RegisterResponse {
-    boolean isSuccessfully;
+
+    Exception e;
 
     @Override
-    public Object getValue() {
-        return isSuccessfully;
+    public boolean hasException() {
+        return e!=null;
+    }
+
+    @Override
+    public Exception getException() {
+        return e;
     }
 }

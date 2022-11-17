@@ -4,5 +4,6 @@ import com.rpc.lrpc.message.Content.MessageContent;
 
 public interface ResponseContent extends MessageContent {
 
-    Object getValue();
+    boolean hasException();
+    Exception getException();
 }

@@ -8,7 +8,5 @@ public interface RPCServiceProvider {
     int getPort();
     RpcService getRpcService();
 
-    void registerService();
 
-    void dokidoki();
 }
