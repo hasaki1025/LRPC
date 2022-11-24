@@ -33,8 +33,7 @@ public class MessageCodec extends MessageToMessageCodec<ByteBuf,DefaultMessage> 
         MessageUtil.messageToByteBuf(msg,buffer);
         if (msg.getMessageType().equals(MessageType.request)
                 && !msg.getCommandType().equals(CommandType.DokiDoki)
-                && !msg.getCommandType().equals(CommandType.Call)
-                && !msg.getCommandType().equals(CommandType.Update))
+                && !msg.getCommandType().equals(CommandType.Call))
         {
             //需要等待的响应
             //心跳发送不需要响应
@@ -54,8 +53,7 @@ public class MessageCodec extends MessageToMessageCodec<ByteBuf,DefaultMessage> 
                 if (!responseMap.stillWaiting(message.getSeq())) {
                     throw new RuntimeException("not match Request of this Response");
                 }
-                if (!message.getCommandType().equals(CommandType.Call)
-                        || !message.getCommandType().equals(CommandType.Update)) {
+                if (!message.getCommandType().equals(CommandType.Call)) {
                     responseMap.removeWaitingRequest(message.getSeq());
                 }
             }

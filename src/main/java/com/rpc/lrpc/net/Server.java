@@ -85,7 +85,7 @@ public class Server implements Closeable {
 
     }
 
-    private void serverChannelInit() {
+    protected void serverChannelInit() {
         //NOOP
     }
 

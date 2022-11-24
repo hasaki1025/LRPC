@@ -1,10 +1,16 @@
 package com.rpc.lrpc.net;
 
 import com.rpc.lrpc.Context.RpcRegister;
+import com.rpc.lrpc.Enums.CommandType;
+import com.rpc.lrpc.Enums.MessageType;
+import com.rpc.lrpc.message.Content.Request.DefaultDeleteServiceRequest;
+import com.rpc.lrpc.message.Content.Request.DeleteServiceRequest;
+import com.rpc.lrpc.message.RequestMessage;
 import com.rpc.lrpc.message.RpcAddress;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.DefaultEventLoopGroup;
+import io.netty.channel.ServerChannel;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -31,16 +37,6 @@ public class RpcRegisterServerChannelInitializer extends RpcServerChannelInitial
         this.register = register;
     }
 
-    @Override
-    protected void initChannel(Channel ch) throws Exception {
-        super.initChannel(ch);
-        dokiDokiMap.addAllUrl(register.getAllUrl());
-        workerGroup.scheduleAtFixedRate(()->{
-            for (RpcAddress url : register.getAllUrl()) {
-                if (!dokiDokiMap.checkUrlIsExpire(url)) {
-                    register.removeAddress(url);
-                }
-            }
-        },0,heartCheckTime, TimeUnit.SECONDS);
-    }
+
+
 }

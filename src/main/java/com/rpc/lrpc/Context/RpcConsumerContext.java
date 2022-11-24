@@ -61,5 +61,21 @@ public class RpcConsumerContext implements RpcConsumer {
         return urls.contains(rpcAddress);
     }
 
+    @Override
+    public void removeAddress(RpcAddress rpcAddress) {
+        if (urls.contains(rpcAddress)) {
+            urls.remove(rpcAddress);
+            if (rpcAddress.getServiceName()!=null
+                    && !"".equals(rpcAddress.getServiceName())
+                    && serviceMap.containsKey(rpcAddress.getServiceName())) {
+                RpcService service = serviceMap.get(rpcAddress.getServiceName());
+                if (urls.stream().noneMatch(x -> x.getServiceName().equals(rpcAddress.getServiceName()))) {
+                    serviceMap.remove(service.getServiceName(),service);
+                    List.of(service.getRpcMappings()).forEach(mappings::remove);
+                }
+            }
+        }
+    }
+
 
 }

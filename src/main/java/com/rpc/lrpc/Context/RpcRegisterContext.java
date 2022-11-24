@@ -106,27 +106,7 @@ public class RpcRegisterContext implements RpcRegister {
         Server.broadcastMessage(new RequestMessage<PushServicesRequest>(CommandType.Push,MessageType.request,request));
     }
 
-    @Override
-    public void removeAddress(RpcAddress rpcAddress) {
-        if (!addressSet.remove(rpcAddress)) {
-            throw new RuntimeException("Do not have this rpcaddress");
-        }
 
-        String serviceName = rpcAddress.getServiceName();
-        if (serviceName==null || serviceName.equals(""))
-        {
-            throw new RuntimeException("Do not have this rpcaddress");
-        }
-        RpcService service = serviceNameMap.get(serviceName);
-        RpcAddress[] addresses = rpcServiceMap.get(service);
-        if (addresses.length==1 && addresses[0].equals(rpcAddress)) {
-            rpcServiceMap.remove(service);
-            serviceNameMap.remove(serviceName);
-        }else {
-
-        }
-
-    }
 
 
 }

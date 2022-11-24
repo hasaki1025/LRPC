@@ -5,17 +5,12 @@ import com.rpc.lrpc.Enums.MessageType;
 import com.rpc.lrpc.message.Content.Request.*;
 import com.rpc.lrpc.message.Content.Response.CallServicesResponse;
 import com.rpc.lrpc.message.Content.Response.ResponseContent;
-import com.rpc.lrpc.message.Content.Response.UpdateServiceResponse;
 import com.rpc.lrpc.message.RequestMessage;
-import com.rpc.lrpc.message.RpcAddress;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.DefaultEventLoopGroup;
 import io.netty.channel.EventLoopGroup;
 import io.netty.util.AttributeKey;
-import io.netty.util.concurrent.Future;
-import io.netty.util.concurrent.FutureListener;
-import io.netty.util.concurrent.GenericFutureListener;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -46,7 +41,8 @@ public class ConsumerClient extends Client {
         DefaultPullServicesRequest request = new DefaultPullServicesRequest();
         channel.writeAndFlush(new RequestMessage<PullServicesRequest>(CommandType.Pull, MessageType.request, request));
     }
-
+    //废弃的Update方法
+    /*
     public RpcAddress update(String rpcServiceName)
     {
         Future<?> submit = workerGroup.submit(() -> updateSync(rpcServiceName));
@@ -74,6 +70,7 @@ public class ConsumerClient extends Client {
         }
         return null;
     }
+*/
 
     private ResponseContent sendMessageSync(RequestMessage<? extends RequestContent> message) {
         AtomicInteger seqCounter = (AtomicInteger) channel.attr(AttributeKey.valueOf("seqCounter")).get();

@@ -17,6 +17,7 @@ public interface RpcConsumer {
     public long getRequestTimeOut();
 
     public boolean containAddress(RpcAddress rpcAddress);
+    void removeAddress(RpcAddress rpcAddress);
 
 
 }

@@ -25,19 +25,7 @@ public class RPCRequestSender {
         try {
             RpcUrl rpcUrl = MessageUtil.parseUrl(url);
             if (!consumer.containAddress(rpcUrl.getAddress())) {
-                //TODO 如果消费者中不含有该地址信息则同步发送Update并获取结果
-                String registerAddress="rpc://"+consumer.getRegisterServerHost()+":"+consumer.getRegisterServerPort();
-                ConsumerClient client = channelPool.getConnection(registerAddress, ConsumerClient.class);
-                String serviceName = rpcUrl.getAddress().getServiceName();
-                if (serviceName ==null || serviceName.equals("")) {
-                    throw new RuntimeException("incorrect Address");
-                }
-                RpcAddress address = client.updateSync(serviceName);
-                if (address==null)
-                {
-                    throw new RuntimeException("can not find Address of this Service");
-                }
-                return channelPool.getConnection(address.toString(), ConsumerClient.class).callSync(params, rpcUrl.getMapping());
+                throw new RuntimeException("Can not find addess of this service");
             }
             else {
                 ConsumerClient client = channelPool.getConnection(rpcUrl.getAddress().toString(), ConsumerClient.class);
