@@ -137,7 +137,7 @@ public class MessageUtil {
      */
 
     public static DefaultMessage rpcResponseToDefaultMessage(ResponseMessage<? extends ResponseContent> response) throws JsonProcessingException {
-        String content = new ObjectMapper().writeValueAsString(response);
+        String content = new ObjectMapper().writeValueAsString(response.content());
 
         return new DefaultMessage(
                 response.getMagicNumber(),

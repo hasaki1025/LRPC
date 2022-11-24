@@ -9,8 +9,9 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE})
+@Component
 public @interface RPCController {
 
-    String value();
+    String value() default "";
 
 }

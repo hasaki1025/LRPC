@@ -6,19 +6,24 @@ import com.rpc.lrpc.Enums.CommandType;
 import com.rpc.lrpc.Enums.MessageType;
 import com.rpc.lrpc.Enums.RpcRole;
 import com.rpc.lrpc.Util.MessageUtil;
+import com.rpc.lrpc.message.Content.Request.CallServicesRequest;
 import com.rpc.lrpc.message.Content.Request.DefaultCallServicesRequest;
 import com.rpc.lrpc.message.Content.Response.DefaultCallServicesResponse;
 import com.rpc.lrpc.message.DefaultMessage;
+import com.rpc.lrpc.message.RequestMessage;
 import com.rpc.lrpc.message.RpcAddress;
 import com.rpc.lrpc.message.RpcUrl;
+import com.rpc.lrpc.net.RPCRequestSender;
 import com.rpc.lrpc.net.ResponseMap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.ChannelHandler;
+import io.netty.channel.ChannelPipeline;
 import io.netty.channel.embedded.EmbeddedChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
+import io.netty.util.AttributeKey;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -31,6 +36,7 @@ import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @SpringBootTest
 public class LRpcApplicationTests {
@@ -52,4 +58,10 @@ public class LRpcApplicationTests {
         System.out.println(address.getPort());
         System.out.println(address.getServiceName());
     }
+    @Autowired
+    RPCRequestSender sender;
+
+
+
+
 }

@@ -20,6 +20,7 @@ public class RPCRequestSender {
     @Autowired
     RpcConsumer consumer;
 
+    //TODO 用户调用的时候是不知道IP和端口的，应该换成服务名称和Mapping,URL格式有问题
     public  Object callSync(String url,Object...params)
     {
         try {
