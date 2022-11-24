@@ -16,4 +16,11 @@ public class RpcURL {
 
     public RpcURL() {
     }
+
+    @Override
+    public String toString() {
+        return "rpc://"+host+":"+port;
+    }
+
+
 }

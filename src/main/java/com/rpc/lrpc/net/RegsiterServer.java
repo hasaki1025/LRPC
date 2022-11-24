@@ -27,15 +27,8 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Component
 @ConditionalOnBean(RpcRegister.class)
-public class RegsiterServer implements Closeable {
-    @Value("${RPC.Register.port}")
-    int port;
-    NioEventLoopGroup bossGroup;
-    NioEventLoopGroup chirdGroup;
-    DefaultEventLoopGroup workerGrop;
-    NioServerSocketChannel channel;
-    @Autowired
-    List<ChannelHandler> handlersChain;
+public class RegsiterServer  extends Server{
+
     @Autowired
     ResponseMap responseMap;
     @Autowired
@@ -45,48 +38,8 @@ public class RegsiterServer implements Closeable {
     @Value("${RPC.Config.HeartCheckTime}")
     int heartCheckTime;
 
-    //用于保存所有连接
-    private static final ChannelGroup CHANNEL_GROUP =new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
-
-
-    void init()
-    {
-        bossGroup=new NioEventLoopGroup(1);
-        chirdGroup=new NioEventLoopGroup();
-        workerGrop=new DefaultEventLoopGroup();
-        new ServerBootstrap()
-                .group(bossGroup,chirdGroup)
-                .channel(NioServerSocketChannel.class)
-                .childHandler(new ChannelInitializer<NioSocketChannel>() {
-
-                    @Override
-                    public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
-                        //将新建立的Channel放入ChannelGroup中
-                        CHANNEL_GROUP.add(ctx.channel());
-                    }
-
-                    @Override
-                    public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
-                        //将终止连接的channel从group中移除
-                        CHANNEL_GROUP.remove(ctx.channel());
-                    }
-
-                    @Override
-                    protected void initChannel(NioSocketChannel ch) throws Exception {
-                        ChannelPipeline pipeline = ch.pipeline();
-                        pipeline.addLast(
-                                new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE,12,4,0,0));
-                        pipeline.addLast(new LoggingHandler(LogLevel.INFO));
-                        pipeline.addLast(handlersChain.toArray(new ChannelHandler[0]));
-                    }
-                }).bind(port).addListener((ChannelFutureListener) future -> {
-                    Channel channel1 = future.channel();
-                    if (channel1 instanceof NioServerSocketChannel) {
-                        channel= (NioServerSocketChannel) channel1;
-                    }
-                });
-
-
+    @Override
+    void NIOServerInit() {
         dokiDokiMap.addAllUrl(register.getAllUrl());
         workerGrop.scheduleWithFixedDelay(()->{
             for (RpcURL url : register.getAllUrl()) {
@@ -95,12 +48,4 @@ public class RegsiterServer implements Closeable {
         },0,heartCheckTime, TimeUnit.SECONDS);
     }
 
-    @Override
-    public void close() throws IOException {
-        channel.close().addListener((ChannelFutureListener) future -> {
-            workerGrop.shutdownGracefully();
-            chirdGroup.shutdownGracefully();
-            bossGroup.shutdownGracefully();
-        });
-    }
 }

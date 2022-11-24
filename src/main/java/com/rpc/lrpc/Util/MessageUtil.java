@@ -138,6 +138,24 @@ public class MessageUtil {
         return bytes;
     }
 
+    public static RpcURL getUrlByString(String address)
+    {
+        if (!address.startsWith("rpc://") || !address.contains(":"))
+        {
+            throw new RuntimeException("Not correct URL");
+        }
+        String s = address.substring(0, 6);
+        String[] split = s.split(":");
+        if (!split[0].contains("."))
+        {
+            throw new RuntimeException("Not correct URL");
+        }
+        RpcURL url = new RpcURL();
+        url.setHost(split[0]);
+        url.setPort(Integer.parseInt(split[1]));
+        return url;
+    }
+
 
 
 }
