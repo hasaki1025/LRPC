@@ -33,6 +33,19 @@ public class MessageUtil {
 
     private static int seq=1;
 
+    public static DefaultMessage RequestToDefaultMessage(RequestMessage<RequestContent> requestMessage,String content)
+    {
+        return new DefaultMessage(requestMessage.getMagicNumber(),
+                requestMessage.getVersion(),
+                requestMessage.getSerializableType(),
+                requestMessage.getCommandType(),
+                content.getBytes(StandardCharsets.UTF_8).length,
+                requestMessage.getSeq(),
+                requestMessage.getMessageType(),
+                content
+        );
+    }
+
     //魔数（4）-版本号（1）-序列化算法（1）-消息类型（1）-指令类型(1)-请求序号(4)-正文长度(4)-消息本体
     public static Message byteToMessage(ByteBuf buf) throws IncorrectMagicNumberException {
         byte[] mn = new byte[4];

@@ -1,5 +1,9 @@
 package com.rpc.lrpc.message.Content.Request;
 
-public class DokiDokiRequest implements RequestContent {
+import com.rpc.lrpc.message.RpcURL;
+import lombok.Data;
 
+@Data
+public class DokiDokiRequest implements RequestContent {
+    RpcURL rpcURL;
 }

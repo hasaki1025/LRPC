@@ -4,6 +4,7 @@ import com.rpc.lrpc.Annotation.RPCController;
 import com.rpc.lrpc.message.RpcController;
 import com.rpc.lrpc.message.RpcMapping;
 import com.rpc.lrpc.message.RpcService;
+import com.rpc.lrpc.message.RpcURL;
 
 import java.util.Collection;
 import java.util.List;
@@ -27,4 +28,7 @@ public interface RPCServiceProvider {
     RpcMapping getMapping(String mapping);
 
     void addController(RpcController rpcController);
+
+    RpcURL getRpcUrl();
+
 }

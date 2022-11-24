@@ -3,13 +3,16 @@ package com.rpc.lrpc.Context;
 import com.rpc.lrpc.message.RpcService;
 import com.rpc.lrpc.message.RpcURL;
 import lombok.Data;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 @Data
 @ConditionalOnProperty(name = {
@@ -22,6 +25,7 @@ public class RpcConsumerContext implements RpcConsumer {
      String registerServerHost;
     @Value("${RPC.Server.port}")
      Integer registerServerPort;
+
 
      final Map<String,RpcService> serviceMap=new ConcurrentHashMap<>();
      final Set<RpcURL> urls=new CopyOnWriteArraySet<>();

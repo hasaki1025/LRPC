@@ -4,6 +4,7 @@ import com.rpc.lrpc.Annotation.RPCController;
 import com.rpc.lrpc.message.RpcController;
 import com.rpc.lrpc.message.RpcMapping;
 import com.rpc.lrpc.message.RpcService;
+import com.rpc.lrpc.message.RpcURL;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,6 +12,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -31,6 +34,9 @@ public class RPCServiceRProviderContext implements RPCServiceProvider{
      String registerServerHost;
     @Value("${RPC.Server.port}")
      int registerServerPort;
+    private RpcURL rpcURL;
+
+
     @Autowired
     ConfigurableApplicationContext applicationContext;
 
@@ -70,6 +76,11 @@ public class RPCServiceRProviderContext implements RPCServiceProvider{
         }
         rpcControllers.addAll(list);
         rpcService=new RpcService(serviceName,rpcControllers.toArray(new RpcController[0]));
+        try {
+            rpcURL=new RpcURL(InetAddress.getLocalHost().getHostAddress(),port,serviceName);
+        } catch (UnknownHostException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -89,6 +100,11 @@ public class RPCServiceRProviderContext implements RPCServiceProvider{
     @Override
     public void addController(RpcController rpcController) {
         rpcControllers.add(rpcController);
+    }
+
+    @Override
+    public RpcURL getRpcUrl() {
+        return rpcURL;
     }
 
     @Override

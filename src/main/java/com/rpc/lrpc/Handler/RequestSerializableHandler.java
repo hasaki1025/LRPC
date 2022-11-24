@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rpc.lrpc.Enums.CommandType;
 import com.rpc.lrpc.Enums.MessageType;
 import com.rpc.lrpc.Enums.SerializableType;
+import com.rpc.lrpc.Util.MessageUtil;
 import com.rpc.lrpc.message.Content.Request.RequestContent;
 import com.rpc.lrpc.message.DefaultMessage;
 import com.rpc.lrpc.message.RequestMessage;
@@ -28,16 +29,14 @@ public class RequestSerializableHandler extends MessageToMessageCodec<DefaultMes
 
     @Override
     protected void encode(ChannelHandlerContext ctx, RequestMessage<RequestContent> msg, List<Object> out) throws Exception {
-
+        String s = new ObjectMapper().writeValueAsString(msg.content());
+        out.add(MessageUtil.RequestToDefaultMessage(msg, s));
     }
 
     @Override
     protected void decode(ChannelHandlerContext ctx, DefaultMessage msg, List<Object> out) throws Exception {
         if(MessageType.request.equals(msg.getMessageType()))
         {
-            String content = msg.content();
-            SerializableType type = msg.getSerializableType();
-            CommandType commandType = msg.getCommandType();
             MessageType messageType = msg.getMessageType();
             if (!MessageType.request.equals(messageType))
             {
