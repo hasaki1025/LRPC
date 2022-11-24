@@ -14,6 +14,10 @@ public class DefaultMessage extends AbstractMessage {
         this.content = content;
     }
 
+    public DefaultMessage(CommandType commandType, int size, int seq, MessageType messageType, String content) {
+        super(commandType, size, seq, messageType);
+        this.content = content;
+    }
 
     @Override
     public String  content() {

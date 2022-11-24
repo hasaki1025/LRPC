@@ -8,6 +8,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+import java.util.function.BiFunction;
 
 @Data
 @ConditionalOnProperty(name = {
@@ -15,59 +16,21 @@ import java.util.*;
 })
 @Component
 public class RpcRegisterContext implements RpcRegister {
-     final Map<String,RpcService> rpcServiceMap=new HashMap<>();
-     final Set<RpcURL> rpcURLS=new HashSet<>();
+     final Map<RpcService,RpcURL[]> rpcServiceMap=new HashMap<>();
 
      @Value("${RPC.Register.port}")
       Integer port;
 
     @Override
-    public RpcService[] getRpcServices() {
-        return rpcServiceMap.values().toArray(new RpcService[0]);
-    }
-
-    @Override
-    public RpcURL[] getRpcServiceURL(String serviceName) {
-        return rpcURLS.stream().filter(x->x.getServiceName().equals(serviceName)).toArray(RpcURL[]::new);
-    }
-
-    @Override
-    public RpcService getRpcService(String serviceName) {
-        return rpcServiceMap.get(serviceName);
-    }
-
-    @Override
-    public RpcURL[] getAllRpcURL() {
-        return rpcURLS.toArray(new RpcURL[0]);
-    }
-
-
-    @Override
-    public void registerService(RpcService rpcService, RpcURL rpcURL) {
-        rpcServiceMap.put(rpcService.getServiceName(),rpcService);
-        rpcURLS.add(rpcURL);
-    }
-
-    @Override
-    public void removeURL(RpcURL rpcURL) {
-        RpcURL[] urls = getRpcServiceURL(rpcURL.getServiceName());
-        if (urls.length==1) {
-            if (urls[0].equals(rpcURL))
-            {
-
-                rpcServiceMap.remove(rpcURL.getServiceName());
-            }
-            else {
-                throw new RuntimeException("Not exist URL.....");
-            }
+    public void registerService(RpcService service, RpcURL rpcURL) {
+        if (rpcServiceMap.containsKey(service))
+        {
+            ArrayList<RpcURL> urls = new ArrayList<>(List.of(rpcServiceMap.get(service)));
+            urls.add(rpcURL);
+            rpcServiceMap.put(service,urls.toArray(new RpcURL[0]));
         }
         else {
-            rpcURLS.remove(rpcURL);
+            rpcServiceMap.put(service,new RpcURL[]{rpcURL});
         }
-    }
-
-    @Override
-    public void addURL(RpcURL rpcURL) {
-        rpcURLS.add(rpcURL);
     }
 }

@@ -13,21 +13,37 @@ import java.util.concurrent.CopyOnWriteArraySet;
 public class ResponseMap {
 
     private final Map<Integer, ResponseContent> responseMap=new ConcurrentHashMap<>();
+    private final Set<Integer> waitingRequestSet=new CopyOnWriteArraySet<>();
 
     public boolean stillWaiting(int seq)
     {
-        return responseMap.containsKey(seq);
+        return waitingRequestSet.contains(seq);
+    }
+
+    public boolean addWaitingRequest(int seq)
+    {
+        return waitingRequestSet.add(seq);
+    }
+
+    public boolean removeWaitingRequest(int seq)
+    {
+        return waitingRequestSet.remove(seq);
     }
 
 
     public void putResponse(int seq,ResponseContent content)
     {
         responseMap.put(seq, content);
+        removeWaitingRequest(seq);
     }
 
     public ResponseContent getResponse(int seq)
     {
-        return responseMap.get(seq);
+        if (!stillWaiting(seq))
+        {
+            return responseMap.get(seq);
+        }
+        return null;
     }
 
 

@@ -1,57 +1,51 @@
 package com.rpc.lrpc.Handler;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rpc.lrpc.Enums.CommandType;
 import com.rpc.lrpc.Enums.MessageType;
 import com.rpc.lrpc.Enums.SerializableType;
+import com.rpc.lrpc.Util.MessageUtil;
 import com.rpc.lrpc.message.Content.Request.RequestContent;
+import com.rpc.lrpc.message.Content.Response.ResponseContent;
 import com.rpc.lrpc.message.DefaultMessage;
 import com.rpc.lrpc.message.RequestMessage;
-import com.rpc.lrpc.net.ResponseMap;
+import com.rpc.lrpc.message.ResponseMessage;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageCodec;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Component
 @ChannelHandler.Sharable
 @Order(1)
-public class RequestSerializableHandler extends MessageToMessageCodec<DefaultMessage, RequestMessage<RequestContent>> {
-
-
+public class ResponseSerializableHandler extends MessageToMessageCodec<DefaultMessage, ResponseMessage<ResponseContent>> {
 
 
     @Override
-    protected void encode(ChannelHandlerContext ctx, RequestMessage<RequestContent> msg, List<Object> out) throws Exception {
-
+    protected void encode(ChannelHandlerContext ctx, ResponseMessage<ResponseContent> msg, List<Object> out) throws Exception {
+        byte[] bytes = new ObjectMapper().writeValueAsString(msg.content()).getBytes(StandardCharsets.UTF_8);
+        //一定要设置
+        msg.setSize(bytes.length);
+        out.add(MessageUtil.rpcResponseToDefaultMessage(msg, new String(bytes, StandardCharsets.UTF_8)));
     }
 
     @Override
     protected void decode(ChannelHandlerContext ctx, DefaultMessage msg, List<Object> out) throws Exception {
-        if(MessageType.request.equals(msg.getMessageType()))
+        if(MessageType.response.equals(msg.getMessageType()))
         {
             String content = msg.content();
             SerializableType type = msg.getSerializableType();
             CommandType commandType = msg.getCommandType();
-            MessageType messageType = msg.getMessageType();
-            if (!MessageType.request.equals(messageType))
-            {
-                out.add(msg);
-                return;
-            }
-            Object value = new ObjectMapper().readValue(msg.content(), CommandType.requestTypeClass[msg.getCommandType().getValue()]);
+            Object value = new ObjectMapper().readValue(msg.content(), CommandType.responseTypeClass[msg.getCommandType().getValue()]);
             //注意从这之后就只有
-            out.add(new RequestMessage<>(msg, (RequestContent) value));
+            out.add(new ResponseMessage<>(msg, (ResponseContent) value));
         }
         else {
             out.add(msg);
         }
-
     }
-
 }

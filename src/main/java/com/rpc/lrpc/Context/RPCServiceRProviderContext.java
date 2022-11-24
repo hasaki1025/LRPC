@@ -85,6 +85,11 @@ public class RPCServiceRProviderContext implements RPCServiceProvider{
     }
 
     @Override
+    public void addController(RpcController rpcController) {
+        rpcControllers.add(rpcController);
+    }
+
+    @Override
     public RpcMapping[] getMappings() {
         return mappings.toArray(new RpcMapping[0]);
     }

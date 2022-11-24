@@ -1,5 +1,7 @@
 package com.rpc.lrpc.Context;
 
+import com.rpc.lrpc.Annotation.RPCController;
+import com.rpc.lrpc.message.RpcController;
 import com.rpc.lrpc.message.RpcMapping;
 import com.rpc.lrpc.message.RpcService;
 
@@ -23,4 +25,6 @@ public interface RPCServiceProvider {
     void addMapping(Collection<RpcMapping> rpcMappings);
 
     RpcMapping getMapping(String mapping);
+
+    void addController(RpcController rpcController);
 }

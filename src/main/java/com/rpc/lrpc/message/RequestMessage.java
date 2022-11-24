@@ -9,18 +9,47 @@ public class RequestMessage<T extends RequestContent> extends AbstractMessage{
 
     T content;
 
-    public RequestMessage(String magicNumber, int version, SerializableType serializableType, CommandType commandType, int size, int seq, MessageType messageType,RequestContent requestContent) {
+    public RequestMessage(CommandType commandType, int seq, MessageType messageType, T content) {
+        super(commandType, seq, messageType);
+        this.content = content;
+    }
+
+
+
+    public RequestMessage(SerializableType serializableType, CommandType commandType, int seq, MessageType messageType, T content) {
+        super(serializableType, commandType, seq, messageType);
+        this.content = content;
+    }
+
+    public RequestMessage(Message message,T content) {
+        super(message.getMagicNumber(), message.getVersion(), message.getSerializableType(), message.getCommandType(), message.size(), message.getSeq(), message.getMessageType());
+        this.content = content;
+    }
+
+
+    public RequestMessage(String magicNumber, int version, SerializableType serializableType, CommandType commandType, int size, int seq, MessageType messageType, T content) {
         super(magicNumber, version, serializableType, commandType, size, seq, messageType);
-        content=(T)requestContent;
+        this.content = content;
     }
 
-    public RequestMessage(Message msg, RequestContent value) {
-        this(msg.getMagicNumber(),msg.getVersion(),msg.getSerializableType(),msg.getCommandType(),msg.size(),msg.getSeq(),msg.getMessageType(),value);
+    public RequestMessage(RequestMessage<? extends RequestContent> requestMessage) {
+        super(
+                requestMessage.getMagicNumber(),
+                requestMessage.getVersion(),
+                requestMessage.getSerializableType(),
+                requestMessage.getCommandType(),
+                requestMessage.getSize(),
+                requestMessage.getSeq(),
+                requestMessage.getMessageType()
+        );
+        this.content= (T) requestMessage.content();
     }
-
 
     @Override
     public T content() {
-        return content;
+        return (T) content;
     }
+
+
+
 }

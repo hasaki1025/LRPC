@@ -16,8 +16,9 @@ public class ReflectUtil {
     {
         ArrayList<Method> list = new ArrayList<>();
         for (Method method : clazz.getMethods()) {
-            if (method.isAnnotationPresent(RPCMapping.class))
+            if (method.isAnnotationPresent(RPCMapping.class)) {
                 list.add(method);
+            }
         }
         return list.toArray(new Method[0]);
     }

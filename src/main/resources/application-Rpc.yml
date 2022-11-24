@@ -1,4 +1,6 @@
 RPC:
+  Config:
+    SerializableType: JSON
   Provider:
     port: 8080
     ServiceName: nihao

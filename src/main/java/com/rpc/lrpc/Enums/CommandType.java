@@ -1,6 +1,7 @@
 package com.rpc.lrpc.Enums;
 
 import com.rpc.lrpc.message.Content.Request.*;
+import com.rpc.lrpc.message.Content.Response.*;
 
 public enum CommandType {
 
@@ -13,6 +14,16 @@ public enum CommandType {
             UpdateServiceRequest.class,
             DokiDokiRequest.class,
             DefaultPushServicesRequest.class
+    };
+
+    // TODO SimpleResponse需要添加
+    public static final Class<?>[] responseTypeClass={
+            DefaultCallServicesResponse.class,
+            DefaultRegisterResponse.class,
+            DefaultPullServicesResponse.class,
+            UpdateServiceResponse.class,
+            DokiDokiResponse.class,
+            DefaultPushServiceResponse.class
     };
 
     private int value;

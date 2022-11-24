@@ -12,37 +12,17 @@ import java.util.Set;
 @Data
 public class DefaultPullServicesResponse implements PullServicesResponse {
 
-    private final Map<String,RpcService> rpcServiceMap=new HashMap<>();
-    private final Set<RpcURL> rpcURLs=new HashSet<>();
-    Exception e;
+    Exception exception;
+    final Map<RpcService, RpcURL[]> rpcServiceMap=new HashMap<>();
 
-    @Override
-    public RpcURL[] getServiceURL(String serviceName) {
-        return rpcURLs.stream().filter(x->x.getServiceName().equals(serviceName)).toArray(RpcURL[]::new);
-    }
-
-    @Override
-    public RpcURL[] getAllServiceURL() {
-        return rpcURLs.toArray(new RpcURL[0]);
-    }
-
-    @Override
-    public RpcService[] getAllRpcService() {
-        return rpcServiceMap.values().toArray(new RpcService[0]);
-    }
-
-    @Override
-    public RpcService getRpcService(String serviceName) {
-        return rpcServiceMap.get(serviceName);
-    }
 
     @Override
     public boolean hasException() {
-        return e!=null;
+        return exception!=null;
     }
 
     @Override
-    public Exception getException() {
-        return e;
+    public void addRpcService(Map<RpcService, RpcURL[]> map) {
+        rpcServiceMap.putAll(map);
     }
 }

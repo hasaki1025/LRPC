@@ -11,6 +11,7 @@ public enum SerializableType {
         return value;
     }
 
+
     private final  static SerializableType[] serializableTypes={JAVA,JSON};
 
     public static SerializableType forInt(int i)

@@ -38,7 +38,7 @@ public class RpcServiceBeanPostProcessor implements BeanPostProcessor {
             controller.setServiceName(provider.getServiceName());
             controller.setRpcMappings(mappings.toArray(new RpcMapping[0]));
             provider.addMapping(mappings);
-            return controller;
+            provider.addController(controller);
         }
         return bean;
     }

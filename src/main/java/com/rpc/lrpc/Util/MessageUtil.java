@@ -4,11 +4,9 @@ import com.rpc.lrpc.Enums.CommandType;
 import com.rpc.lrpc.Enums.MessageType;
 import com.rpc.lrpc.Enums.SerializableType;
 import com.rpc.lrpc.Exception.IncorrectMagicNumberException;
-import com.rpc.lrpc.message.AbstractMessage;
+import com.rpc.lrpc.message.*;
 import com.rpc.lrpc.message.Content.Request.*;
-import com.rpc.lrpc.message.DefaultMessage;
-import com.rpc.lrpc.message.Message;
-import com.rpc.lrpc.message.RequestMessage;
+import com.rpc.lrpc.message.Content.Response.ResponseContent;
 import io.netty.buffer.ByteBuf;
 import lombok.extern.slf4j.Slf4j;
 
@@ -92,6 +90,21 @@ public class MessageUtil {
         buffer.writeInt(message.size());
 
         buffer.writeBytes(((String) message.content()).getBytes(StandardCharsets.UTF_8));
+    }
+
+
+    public static DefaultMessage rpcResponseToDefaultMessage(ResponseMessage<? extends ResponseContent> response,String content)
+    {
+        return new DefaultMessage(
+                response.getMagicNumber(),
+                response.getVersion(),
+                response.getSerializableType(),
+                response.getCommandType(),
+                response.size(),
+                response.getSeq(),
+                response.getMessageType(),
+                content
+        );
     }
 
 
