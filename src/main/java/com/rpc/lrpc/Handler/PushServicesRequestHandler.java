@@ -1,18 +1,11 @@
 package com.rpc.lrpc.Handler;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rpc.lrpc.Context.RpcConsumer;
-import com.rpc.lrpc.Context.RpcRegister;
 import com.rpc.lrpc.Enums.CommandType;
 import com.rpc.lrpc.Enums.MessageType;
 import com.rpc.lrpc.Enums.RpcRole;
 import com.rpc.lrpc.message.Content.Request.PushServicesRequest;
-import com.rpc.lrpc.message.Content.Request.RequestContent;
-import com.rpc.lrpc.message.Content.Response.DefaultCallServicesResponse;
-import com.rpc.lrpc.message.Content.Response.DefaultPushServiceResponse;
-import com.rpc.lrpc.message.Content.Response.PushServiceResponse;
 import com.rpc.lrpc.message.Content.Response.SimpleResponse;
-import com.rpc.lrpc.message.DefaultMessage;
 import com.rpc.lrpc.message.RequestMessage;
 import com.rpc.lrpc.message.ResponseMessage;
 import io.netty.channel.ChannelHandler;
@@ -23,8 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
-
-import java.nio.charset.StandardCharsets;
 
 @ConditionalOnBean(RpcConsumer.class)
 @Component
@@ -39,7 +30,7 @@ public class PushServicesRequestHandler extends SimpleChannelInboundHandler<Requ
     protected void channelRead0(ChannelHandlerContext ctx, RequestMessage<PushServicesRequest> msg) throws Exception {
         SimpleResponse response = new SimpleResponse();
         try{
-            rpcConsumer.addServices(msg.content().getServicesMap());
+            rpcConsumer.addService(msg.content().getRpcService());
         }catch (Exception e)
         {
             e.printStackTrace();

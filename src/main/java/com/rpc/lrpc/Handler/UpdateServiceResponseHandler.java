@@ -15,7 +15,6 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
-import java.util.Map;
 
 @Component
 @ConditionalOnBean(RpcConsumer.class)
@@ -35,7 +34,7 @@ public class UpdateServiceResponseHandler extends SimpleChannelInboundHandler<Re
             RpcService rpcService = msg.content().getRpcService();
             HashMap<RpcService, RpcURL[]> map = new HashMap<>();
             map.put(rpcService,urls);
-            rpcConsumer.addServices(map);
+            rpcConsumer.addService(map);
         }
         else {
             msg.content().getException().printStackTrace();

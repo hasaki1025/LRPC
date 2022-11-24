@@ -39,14 +39,12 @@ public class DokiDokiRequestHandler extends SimpleChannelInboundHandler<RequestM
     DokiDokiMap dokiDokiMap;
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, RequestMessage<DokiDokiRequest> msg) throws Exception {
-        SimpleResponse response = new SimpleResponse();
         try
         {
             dokiDokiMap.updateOrAddLastDokiTime(msg.content().getRpcURL());
         }catch (Exception e)
         {
             e.printStackTrace();
-            response.setException(e);
         }
     }
 }

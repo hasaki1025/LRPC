@@ -36,6 +36,6 @@ public class PullServicesRequestHandler extends SimpleChannelInboundHandler<Requ
             e.printStackTrace();
             response.setException(e);
         }
-        ctx.writeAndFlush(new ResponseMessage<>(CommandType.Pull, msg.getSeq(), MessageType.response, response, RpcRole.Register));
+        ctx.writeAndFlush(new ResponseMessage<>(msg.getCommandType(),msg.getMessageType(),response,msg.getSeq()));
     }
 }

@@ -9,7 +9,8 @@ import java.util.Map;
 public interface RpcConsumer {
 
     Object comsumer(String serviceName,String mapping,Object[] params);
-    void addServices(Map<RpcService,RpcURL[]> map);
+    void addService(RpcService service);
+    void addServices(Map<RpcService,RpcURL[]> service);
     void updateServices(RpcService rpcService, RpcURL rpcURL);
 
     String getRegisterServerHost();

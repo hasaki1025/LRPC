@@ -12,6 +12,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.*;
@@ -34,6 +36,9 @@ public class RPCServiceRProviderContext implements RPCServiceProvider{
      String registerServerHost;
     @Value("${RPC.Server.port}")
      int registerServerPort;
+
+    @Autowired
+    ConfigurableApplicationContext applicationContext;
     private RpcURL rpcURL;
 
 
@@ -106,6 +111,14 @@ public class RPCServiceRProviderContext implements RPCServiceProvider{
     @Override
     public RpcURL getRpcUrl() {
         return rpcURL;
+    }
+
+    @Override
+    public Object invokeMapping(Object[] params, String mapping) throws InvocationTargetException, IllegalAccessException {
+        RpcMapping rpcMapping = mappingMap.get(mapping);
+        Method source = rpcMapping.getSource();
+        Object bean = applicationContext.getBean(rpcMapping.getClazz());
+        return source.invoke(bean, params);
     }
 
     @Override

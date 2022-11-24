@@ -1,5 +1,7 @@
 package com.rpc.lrpc.Util;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rpc.lrpc.Enums.CommandType;
 import com.rpc.lrpc.Enums.MessageType;
 import com.rpc.lrpc.Enums.RpcRole;
@@ -29,15 +31,41 @@ public class MessageUtil {
     public static  CommandType DEFAULT_COMMANDTYPE;
     public static MessageType messageType;
 
+    /**
+     * 字符串反序列化并转换为RequestMessage
+     * @param msg 内容为字符串类型的Message,
+     * @return 内容为字符串序列化后的Message
+     * @throws JsonProcessingException
+     */
+    public static RequestMessage<RequestContent> DefaultMessageToRequest(DefaultMessage msg) throws JsonProcessingException {
 
-    public static DefaultMessage requestToDefaultMessage(RequestMessage<RequestContent> request, String content)
-    {
+        Object content = new ObjectMapper().readValue(msg.content(), CommandType.requestTypeClass[msg.getCommandType().getValue()]);
+        return new RequestMessage<>(
+                msg.getMagicNumber(),
+                msg.getVersion(),
+                msg.getSerializableType(),
+                msg.getCommandType(),
+                msg.getSize(),
+                msg.getSeq(),
+                msg.getMessageType(),
+                (RequestContent) content
+        );
+    }
+
+    /**
+     * 将原生请求内容序列化后重新包装为Message,同时设置了Size字段的大小
+     * @param request 原生请求
+     * @return 原生RequestContent转换为字符串后的请求
+     * @throws JsonProcessingException JSON异常
+     */
+    public static DefaultMessage requestToDefaultMessage(RequestMessage<RequestContent> request) throws JsonProcessingException {
+        String content = new ObjectMapper().writeValueAsString(request.content());
         return new DefaultMessage(
                 request.getMagicNumber(),
                 request.getVersion(),
                 request.getSerializableType(),
                 request.getCommandType(),
-                request.size(),
+                content.getBytes(StandardCharsets.UTF_8).length,
                 request.getSeq(),
                 request.getMessageType(),
                 content
@@ -102,18 +130,45 @@ public class MessageUtil {
         buffer.writeBytes(((String) message.content()).getBytes(StandardCharsets.UTF_8));
     }
 
+    /**
+     * 序列化和设置size字段
+     * @param response 响应Message
+     * @return 序列化后响应Message
+     * @throws JsonProcessingException
+     */
 
-    public static DefaultMessage rpcResponseToDefaultMessage(ResponseMessage<? extends ResponseContent> response,String content)
-    {
+    public static DefaultMessage rpcResponseToDefaultMessage(ResponseMessage<? extends ResponseContent> response) throws JsonProcessingException {
+        String content = new ObjectMapper().writeValueAsString(response);
+
         return new DefaultMessage(
                 response.getMagicNumber(),
                 response.getVersion(),
                 response.getSerializableType(),
                 response.getCommandType(),
-                response.size(),
+                content.getBytes(StandardCharsets.UTF_8).length,
                 response.getSeq(),
                 response.getMessageType(),
                 content
+        );
+    }
+
+    /**
+     *
+     * @param msg 内容为字符串的Message
+     * @return 反序列化后的Message
+     * @throws JsonProcessingException
+     */
+    public static ResponseMessage<ResponseContent> DefaultMessageToResponse(DefaultMessage msg) throws JsonProcessingException {
+        Object content = new ObjectMapper().readValue(msg.content(), CommandType.responseTypeClass[msg.getCommandType().getValue()]);
+        return new ResponseMessage<>(
+                msg.getMagicNumber(),
+                msg.getVersion(),
+                msg.getSerializableType(),
+                msg.getCommandType(),
+                msg.getSize(),
+                msg.getSeq(),
+                msg.getMessageType(),
+                (ResponseContent) content
         );
     }
 

@@ -6,6 +6,7 @@ import com.rpc.lrpc.message.RpcMapping;
 import com.rpc.lrpc.message.RpcService;
 import com.rpc.lrpc.message.RpcURL;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.List;
 
@@ -30,5 +31,7 @@ public interface RPCServiceProvider {
     void addController(RpcController rpcController);
 
     RpcURL getRpcUrl();
+
+    Object invokeMapping(Object[] params,String mapping) throws InvocationTargetException, IllegalAccessException;
 
 }

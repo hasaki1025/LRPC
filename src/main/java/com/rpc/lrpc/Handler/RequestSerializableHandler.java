@@ -13,11 +13,14 @@ import com.rpc.lrpc.net.ResponseMap;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageCodec;
+import io.netty.util.AttributeKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
 @ChannelHandler.Sharable
@@ -28,9 +31,10 @@ public class RequestSerializableHandler extends MessageToMessageCodec<DefaultMes
 
     @Override
     protected void encode(ChannelHandlerContext ctx, RequestMessage<RequestContent> msg, List<Object> out) throws Exception {
-        String s = new ObjectMapper().writeValueAsString(msg.content());
-
-        out.add(MessageUtil.requestToDefaultMessage(msg, s));
+        AtomicInteger seqCounter = (AtomicInteger) ctx.channel().attr(AttributeKey.valueOf("seqCounter")).get();
+        //设置SEQ
+        msg.setSeq(seqCounter.getAndIncrement());
+        out.add(MessageUtil.requestToDefaultMessage(msg));
     }
 
     @Override
@@ -43,9 +47,8 @@ public class RequestSerializableHandler extends MessageToMessageCodec<DefaultMes
                 out.add(msg);
                 return;
             }
-            Object value = new ObjectMapper().readValue(msg.content(), CommandType.requestTypeClass[msg.getCommandType().getValue()]);
             //注意从这之后就只有
-            out.add(new RequestMessage<>(msg, (RequestContent) value));
+            out.add(MessageUtil.DefaultMessageToRequest(msg));
         }
         else {
             out.add(msg);

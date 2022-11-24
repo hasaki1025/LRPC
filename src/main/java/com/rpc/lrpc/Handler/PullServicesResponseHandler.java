@@ -26,6 +26,6 @@ public class PullServicesResponseHandler extends SimpleChannelInboundHandler<Res
     ResponseMap responseMap;
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ResponseMessage<PullServicesResponse> msg) throws Exception {
-        rpcConsumer.addServices(msg.content().getRpcServiceMap());
+        rpcConsumer.addService(msg.content().getRpcServiceMap());
     }
 }

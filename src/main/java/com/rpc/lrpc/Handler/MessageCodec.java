@@ -55,10 +55,6 @@ public class MessageCodec extends MessageToMessageCodec<ByteBuf,DefaultMessage> 
                     responseMap.removeWaitingRequest(message.getSeq());
                 }
             }
-            RpcRole role = message.getRpcRole();
-            if (role.equals(RpcRole.Consumer) && !Server.containConsumerChannnel(ctx.channel())) {
-                Server.addConsumerChannel(ctx.channel());
-            }
             out.add(message);
         } catch (IncorrectMagicNumberException e) {
             throw new RuntimeException(e);

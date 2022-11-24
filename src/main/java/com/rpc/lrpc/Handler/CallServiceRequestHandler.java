@@ -35,8 +35,6 @@ public class CallServiceRequestHandler extends SimpleChannelInboundHandler<Reque
     @Autowired
     RPCServiceProvider provider;
 
-    @Autowired
-    ConfigurableApplicationContext applicationContext;
 
     @Value("${RPC.Config.SerializableType}")
     String serializableType;
@@ -44,26 +42,18 @@ public class CallServiceRequestHandler extends SimpleChannelInboundHandler<Reque
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, RequestMessage<CallServicesRequest> msg) {
         DefaultCallServicesResponse response = new DefaultCallServicesResponse();
-        SerializableType serializabletype =
-                (serializableType==null || "".equals(serializableType)) ? SerializableType.JSON : Enum.valueOf(SerializableType.class,serializableType);
+        //TODO 在此处获取Mapping对应的方法和参数等信息
         try {
             log.info("get Call ServicesRequest:{}",msg);
             CallServicesRequest request = msg.content();
-            //TODO 在此处获取Mapping对应的方法和参数等信息
-            RpcMapping mapping = provider.getMapping(request.getMapping());
-            Class<?> clazz = mapping.getClazz();
-            Object bean = applicationContext.getBean(clazz);
-            Object result = mapping.getSource().invoke(bean, request.getParamValues());
+            response.setResult(provider.invokeMapping(request.getParamValues(),request.getMapping()));
             log.info("Method Invoke successfully....");
-            response.setResult(result);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            log.info("Method Invoke fail....");
-            response.setException(e);
-            e.printStackTrace();
+        } catch (InvocationTargetException | IllegalAccessException e) {
+            throw new RuntimeException(e);
         }
         //并没有定义size
         ctx.writeAndFlush(
-                new ResponseMessage<CallServicesResponse>(CommandType.Call,MessageType.response,RpcRole.Provider,response,msg.getSeq())
+                new ResponseMessage<CallServicesResponse>(CommandType.Call,MessageType.response,response,msg.getSeq())
         );
     }
 }

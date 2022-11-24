@@ -12,14 +12,17 @@ public class ResponseMessage <T extends ResponseContent> extends AbstractMessage
 
      T content;
 
-    public ResponseMessage(CommandType commandType, MessageType messageType, T content) {
+
+    public ResponseMessage(CommandType commandType, MessageType messageType, T content, int seq) {
         super(commandType, messageType);
         this.content = content;
+        this.seq=seq;
     }
 
-    public ResponseMessage(SerializableType serializableType, CommandType commandType, MessageType messageType, T content) {
+    public ResponseMessage(SerializableType serializableType, CommandType commandType, MessageType messageType, T content,int seq) {
         super(serializableType, commandType, messageType);
         this.content = content;
+        this.seq=seq;
     }
 
     public ResponseMessage(String magicNumber, int version, SerializableType serializableType, CommandType commandType, int size, int seq, MessageType messageType, T content) {

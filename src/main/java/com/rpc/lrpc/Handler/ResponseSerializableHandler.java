@@ -27,19 +27,15 @@ public class ResponseSerializableHandler extends MessageToMessageCodec<DefaultMe
 
     @Override
     protected void encode(ChannelHandlerContext ctx, ResponseMessage<ResponseContent> msg, List<Object> out) throws Exception {
-        byte[] bytes = new ObjectMapper().writeValueAsString(msg.content()).getBytes(StandardCharsets.UTF_8);
-        //一定要设置
-        msg.setSize(bytes.length);
-        out.add(MessageUtil.rpcResponseToDefaultMessage(msg, new String(bytes, StandardCharsets.UTF_8)));
+        out.add(MessageUtil.rpcResponseToDefaultMessage(msg));
     }
 
     @Override
     protected void decode(ChannelHandlerContext ctx, DefaultMessage msg, List<Object> out) throws Exception {
         if(MessageType.response.equals(msg.getMessageType()))
         {
-            Object value = new ObjectMapper().readValue(msg.content(), CommandType.responseTypeClass[msg.getCommandType().getValue()]);
             //注意从这之后就只有
-            out.add(new ResponseMessage<>(msg, (ResponseContent) value));
+            out.add(MessageUtil.DefaultMessageToResponse(msg));
         }
         else {
             out.add(msg);
