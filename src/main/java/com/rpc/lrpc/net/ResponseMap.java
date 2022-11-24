@@ -2,6 +2,7 @@ package com.rpc.lrpc.net;
 
 import com.rpc.lrpc.message.Content.Response.CallServicesResponse;
 import com.rpc.lrpc.message.Content.Response.ResponseContent;
+import com.rpc.lrpc.message.Content.Response.UpdateServiceResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -54,7 +55,7 @@ public class ResponseMap {
     public void putResponse(int seq,ResponseContent content)
     {
         responseMap.put(seq, content);
-        if (content instanceof CallServicesResponse)
+        if (content instanceof CallServicesResponse || content instanceof UpdateServiceResponse)
         {
             removeWaitingRequestSync(seq);
         }
@@ -68,6 +69,7 @@ public class ResponseMap {
     {
         if (!stillWaiting(seq))
         {
+            responseMap.remove(seq);
             return responseMap.get(seq);
         }
         return null;

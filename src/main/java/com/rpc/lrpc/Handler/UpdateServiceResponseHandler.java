@@ -5,6 +5,7 @@ import com.rpc.lrpc.message.Content.Response.UpdateServiceResponse;
 import com.rpc.lrpc.message.ResponseMessage;
 import com.rpc.lrpc.message.RpcService;
 import com.rpc.lrpc.message.RpcAddress;
+import com.rpc.lrpc.net.ResponseMap;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -25,19 +26,30 @@ public class UpdateServiceResponseHandler extends SimpleChannelInboundHandler<Re
 
     @Autowired
     RpcConsumer rpcConsumer;
+    @Autowired
+    ResponseMap responseMap;
 
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ResponseMessage<UpdateServiceResponse> msg) throws Exception {
-        if (!msg.content().hasException()) {
-            RpcAddress[] urls = msg.content().getRpcAddresses();
-            RpcService rpcService = msg.content().getRpcService();
-            HashMap<RpcService, RpcAddress[]> map = new HashMap<>();
-            map.put(rpcService,urls);
-            rpcConsumer.addServices(map);
+        try
+        {
+            if (!msg.content().hasException()) {
+                RpcAddress[] urls = msg.content().getRpcAddresses();
+                RpcService rpcService = msg.content().getRpcService();
+                HashMap<RpcService, RpcAddress[]> map = new HashMap<>();
+                map.put(rpcService,urls);
+                rpcConsumer.addServices(map);
+            }
+            else {
+                msg.content().getException().printStackTrace();
+                responseMap.putResponse(msg.getSeq(),msg.content());
+            }
+            responseMap.putResponse(msg.getSeq(),msg.content());
+        }catch (Exception e)
+        {
+            e.printStackTrace();
         }
-        else {
-            msg.content().getException().printStackTrace();
-        }
+
     }
 }

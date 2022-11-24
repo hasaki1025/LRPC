@@ -26,11 +26,17 @@ public class CallServiceResponseHandler extends SimpleChannelInboundHandler<Resp
     ResponseMap responseMap;
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ResponseMessage<CallServicesResponse> msg) throws Exception {
-        log.info("[{}] Request get Response",msg.getSeq());
-        if (msg.content().hasException()) {
-            msg.content().getException().printStackTrace();
-        }else {
-            responseMap.putResponse(msg.getSeq(),msg.content());
+        try {
+            log.info("[{}] Request get Response",msg.getSeq());
+            if (msg.content().hasException()) {
+                msg.content().getException().printStackTrace();
+            }else {
+                responseMap.putResponse(msg.getSeq(),msg.content());
+            }
+        } catch (Exception e)
+        {
+            e.printStackTrace();
         }
+
     }
 }

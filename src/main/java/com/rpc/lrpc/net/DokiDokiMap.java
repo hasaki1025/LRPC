@@ -16,6 +16,11 @@ public class DokiDokiMap {
 
     public boolean checkUrlIsExpire(RpcAddress url)
     {
+        if (!dokodoki.containsKey(url))
+        {
+            dokodoki.put(url,System.currentTimeMillis());
+            return true;
+        }
         long lastDokiTime = dokodoki.get(url);
         if (System.currentTimeMillis()-lastDokiTime>expireTime*1000)
         {

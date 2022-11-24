@@ -3,12 +3,19 @@ package com.rpc.lrpc.net;
 import com.rpc.lrpc.Enums.CommandType;
 import com.rpc.lrpc.Enums.MessageType;
 import com.rpc.lrpc.message.Content.Request.*;
+import com.rpc.lrpc.message.Content.Response.CallServicesResponse;
+import com.rpc.lrpc.message.Content.Response.ResponseContent;
+import com.rpc.lrpc.message.Content.Response.UpdateServiceResponse;
 import com.rpc.lrpc.message.RequestMessage;
+import com.rpc.lrpc.message.RpcAddress;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.DefaultEventLoopGroup;
 import io.netty.channel.EventLoopGroup;
 import io.netty.util.AttributeKey;
+import io.netty.util.concurrent.Future;
+import io.netty.util.concurrent.FutureListener;
+import io.netty.util.concurrent.GenericFutureListener;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -40,18 +47,35 @@ public class ConsumerClient extends Client {
         channel.writeAndFlush(new RequestMessage<PullServicesRequest>(CommandType.Pull, MessageType.request, request));
     }
 
-    public void update(String rpcServiceName)
+    public RpcAddress update(String rpcServiceName)
+    {
+        Future<?> submit = workerGroup.submit(() -> updateSync(rpcServiceName));
+        submit.addListener(future -> {
+            if (future.isSuccess())
+            {
+                RpcAddress address = (RpcAddress) future.get();
+                //TODO 返回或者调用Call
+            }
+        });
+    }
+
+    public RpcAddress updateSync(String rpcServiceName)
     {
         DefaultUpdateServiceRequest request = new DefaultUpdateServiceRequest();
         request.setServiceName(rpcServiceName);
-        channel.writeAndFlush(new RequestMessage<UpdateServiceRequest>(CommandType.Update, MessageType.request, request));
+        RequestMessage<UpdateServiceRequest> message =
+                new RequestMessage<>(CommandType.Update, MessageType.request, request);
+        UpdateServiceResponse content = (UpdateServiceResponse) sendMessageSync(message);
+        if (!content.hasException()) {
+            RpcAddress[] addresses = content.getRpcAddresses();
+            if (addresses.length>0) {
+                return addresses[0];
+            }
+        }
+        return null;
     }
 
-    public Object callSync(Object[] params, String mapping) {
-        DefaultCallServicesRequest request = new DefaultCallServicesRequest();
-        request.setParamValues(params);
-        request.setMapping(mapping);
-        RequestMessage<CallServicesRequest> message = new RequestMessage<>(CommandType.Call, MessageType.request, request);
+    private ResponseContent sendMessageSync(RequestMessage<? extends RequestContent> message) {
         AtomicInteger seqCounter = (AtomicInteger) channel.attr(AttributeKey.valueOf("seqCounter")).get();
         //在这里已经设置了SEQ，之后无需再次设置
         int seq = seqCounter.getAndIncrement();
@@ -67,6 +91,19 @@ public class ConsumerClient extends Client {
             }
         }
         return responseMap.getResponse(seq);
+    }
+
+    public Object callSync(Object[] params, String mapping) {
+        DefaultCallServicesRequest request = new DefaultCallServicesRequest();
+        request.setParamValues(params);
+        request.setMapping(mapping);
+        RequestMessage<CallServicesRequest> message =
+                new RequestMessage<>(CommandType.Call, MessageType.request, request);
+        CallServicesResponse content = (CallServicesResponse) sendMessageSync(message);
+        if (!content.hasException()) {
+            return content.getResult();
+        }
+        return null;
     }
 
     public<T> void call(Object[] params, String mapping, Consumer<T> consumer)
@@ -89,7 +126,11 @@ public class ConsumerClient extends Client {
                     responseMap.removeWaitingRequest(seq);
                     throw new RuntimeException(e);
                 }
-                consumer.accept((T)responseMap.getResponse(seq));
+                CallServicesResponse response = (CallServicesResponse) responseMap.getResponse(seq);
+                if (!response.hasException())
+                {
+                    consumer.accept((T)response.getResult());
+                }
             }
         });
     }

@@ -37,7 +37,9 @@ public class RpcRegisterServerChannelInitializer extends RpcServerChannelInitial
         dokiDokiMap.addAllUrl(register.getAllUrl());
         workerGroup.scheduleAtFixedRate(()->{
             for (RpcAddress url : register.getAllUrl()) {
-                dokiDokiMap.checkUrlIsExpire(url);
+                if (!dokiDokiMap.checkUrlIsExpire(url)) {
+                    register.removeAddress(url);
+                }
             }
         },0,heartCheckTime, TimeUnit.SECONDS);
     }

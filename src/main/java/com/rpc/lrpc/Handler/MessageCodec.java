@@ -31,7 +31,10 @@ public class MessageCodec extends MessageToMessageCodec<ByteBuf,DefaultMessage> 
     protected void encode(ChannelHandlerContext ctx, DefaultMessage msg, List<Object> out) throws Exception {
         ByteBuf buffer = ctx.alloc().buffer();
         MessageUtil.messageToByteBuf(msg,buffer);
-        if (msg.getMessageType().equals(MessageType.request) && !msg.getCommandType().equals(CommandType.DokiDoki) && !msg.getCommandType().equals(CommandType.Call))
+        if (msg.getMessageType().equals(MessageType.request)
+                && !msg.getCommandType().equals(CommandType.DokiDoki)
+                && !msg.getCommandType().equals(CommandType.Call)
+                && !msg.getCommandType().equals(CommandType.Update))
         {
             //需要等待的响应
             //心跳发送不需要响应
@@ -51,7 +54,8 @@ public class MessageCodec extends MessageToMessageCodec<ByteBuf,DefaultMessage> 
                 if (!responseMap.stillWaiting(message.getSeq())) {
                     throw new RuntimeException("not match Request of this Response");
                 }
-                if (!message.getCommandType().equals(CommandType.Call)) {
+                if (!message.getCommandType().equals(CommandType.Call)
+                        || !message.getCommandType().equals(CommandType.Update)) {
                     responseMap.removeWaitingRequest(message.getSeq());
                 }
             }
