@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
@@ -29,35 +30,31 @@ public class Client implements Closeable {
     Channel channel;
     final RpcClientChannelInitializer channelInitializer;
 
-    ChannelResponse channelResponse;
     long timeout;
 
 
     public Client(EventLoopGroup group, DefaultEventLoopGroup workerGroup, List<ChannelHandler> handlers,long timeout) {
         this.group = group;
         this.workerGroup = workerGroup;
-        channelResponse=new ChannelResponse();
-        this.channelInitializer = new RpcClientChannelInitializer(handlers,channelResponse);
+        this.channelInitializer = new RpcClientChannelInitializer(handlers);
         this.timeout=timeout;
     }
 
-    void init(String host, int port, Class<? extends Channel> channelClass)
-    {
+    void init(String host, int port, Class<? extends Channel> channelClass) {
+
+
         try {
             channel = new Bootstrap()
                     .group(group)
                     .channel(channelClass)
                     .handler(channelInitializer).connect(host, port).sync().channel();
-            channelInit();
+
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
+
     }
 
-    void channelInit()
-    {
-        //NOOP
-    }
 
 
     @Override
@@ -69,22 +66,13 @@ public class Client implements Closeable {
 
     protected Future<ResponseContent> sendMessage(RequestMessage<? extends RequestContent> message) {
         AtomicInteger seqCounter = (AtomicInteger) channel.attr(AttributeKey.valueOf(MessageUtil.SEQ_COUNTER_NAME)).get();
+        ChannelResponse responseMap = (ChannelResponse) channel.attr(AttributeKey.valueOf(MessageUtil.CHANNEL_RESPONSE_MAP)).get();
         //在这里已经设置了SEQ，之后无需再次设置
         int seq = seqCounter.getAndIncrement();
         message.setSeq(seq);
-
         channel.writeAndFlush(message);
 
-        return workerGroup.submit(() -> {
-            try {
-                channelResponse.lock(seq,timeout);
-                return channelResponse.getResponse(seq);
-            } catch (InterruptedException e) {
-                channelResponse.removeWaitingRequest(seq);
-                e.printStackTrace();
-                throw new RuntimeException(e);
-            }
-        });
+        return workerGroup.submit(() -> responseMap.lockAndGetResponse(seq, timeout));
     }
 
 

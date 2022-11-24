@@ -1,5 +1,6 @@
 package com.rpc.lrpc.net;
 
+import com.rpc.lrpc.Context.RpcConsumer;
 import com.rpc.lrpc.Enums.CommandType;
 import com.rpc.lrpc.Enums.MessageType;
 import com.rpc.lrpc.message.Content.Request.*;
@@ -8,48 +9,25 @@ import com.rpc.lrpc.message.Content.Response.DefaultCallServicesResponse;
 import com.rpc.lrpc.message.Content.Response.ResponseContent;
 import com.rpc.lrpc.message.RequestMessage;
 import io.netty.channel.*;
-import io.netty.util.AttributeKey;
-import io.netty.util.concurrent.Future;
-import io.netty.util.concurrent.GenericFutureListener;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 
-public class ConsumerClient extends Client {
+public class ConsumerToProviderClient extends Client {
 
 
-    private boolean isInit=false;
-
-    @Override
-    void init(String host, int port, Class<? extends Channel> channelClass) {
-        if (!isInit)
-        {
-            isInit=true;
-            super.init(host, port, channelClass);
-        }
-    }
-
-
-    public ConsumerClient(EventLoopGroup group, DefaultEventLoopGroup workerGroup, List<ChannelHandler> handlers,long timeout) {
+    public ConsumerToProviderClient(EventLoopGroup group, DefaultEventLoopGroup workerGroup, List<ChannelHandler> handlers, long timeout) {
         super(group, workerGroup, handlers, timeout);
     }
-
-
-    public void pull() throws ExecutionException, InterruptedException {
-        DefaultPullServicesRequest request = new DefaultPullServicesRequest();
-        request.setObject(new Object());
-        RequestMessage<PullServicesRequest> message = new RequestMessage<>(CommandType.Pull, MessageType.request, request);
-        sendMessage(message).get();
-    }
-
-
-
-
     public Optional<Object> callSync(Object[] params, String mapping) throws ExecutionException, InterruptedException {
         DefaultCallServicesRequest request = new DefaultCallServicesRequest();
         request.setParamValues(params);
@@ -71,4 +49,5 @@ public class ConsumerClient extends Client {
             consumer.accept((T) content.getResult());
         });
     }
+
 }

@@ -95,4 +95,12 @@ public class RpcConsumerContext implements RpcConsumer {
     public RpcAddress getRpcAddress(String serviceName) {
         return loadBalanceMap.get(serviceName).getNext(addressMap.get(serviceName));
     }
+
+    @Value("${RPC.Config.ChannelType}")
+    String channelType;
+
+    @Override
+    public String getChannelType() {
+        return channelType;
+    }
 }

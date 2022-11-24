@@ -1,11 +1,14 @@
 package com.rpc.lrpc.net;
 
+import com.rpc.lrpc.Context.RpcRegister;
 import com.rpc.lrpc.message.RpcAddress;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.ConcurrentHashMap;
 @Component
+@ConditionalOnBean(RpcRegister.class)
 public class DokiDokiMap {
 
     private final ConcurrentHashMap<RpcAddress, Long> dokodoki=new ConcurrentHashMap<>();

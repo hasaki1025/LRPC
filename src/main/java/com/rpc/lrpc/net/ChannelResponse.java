@@ -3,22 +3,29 @@ package com.rpc.lrpc.net;
 import com.rpc.lrpc.message.Content.Response.ResponseContent;
 
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArraySet;
 
 public class ChannelResponse {
     private final Map<Integer,Object> waitingMap=new ConcurrentHashMap<>();
     private final Map<Integer, ResponseContent> resultMap=new ConcurrentHashMap<>();
 
-    public void lock(int seq,long waitingTime) throws InterruptedException {
-        synchronized (waitingMap.get(seq)) {
-            waitingMap.get(seq).wait(waitingTime);
+    public ResponseContent lockAndGetResponse(int seq, long waitingTime)  {
+        try
+        {
+            waitingMap.put(seq,new Object());
+            synchronized (waitingMap.get(seq)) {
+                waitingMap.get(seq).wait(waitingTime);
+                return resultMap.get(seq);
+            }
+        }catch (Exception e)
+        {
+            e.printStackTrace();
         }
+        return null;
     }
     public void addWaitRequest(int seq)
     {
-        waitingMap.put(seq,new Object());
+        waitingMap.putIfAbsent(seq,new Object());
     }
     public boolean stillWaiting(int seq)
     {
@@ -26,7 +33,9 @@ public class ChannelResponse {
     }
     public ResponseContent getResponse(int seq)
     {
-        return resultMap.get(seq);
+        ResponseContent content = resultMap.get(seq);
+        resultMap.remove(seq);
+        return content;
     }
 
     public void putResponse(int seq,ResponseContent content)
@@ -41,7 +50,6 @@ public class ChannelResponse {
     public void removeWaitingRequest(int seq)
     {
         waitingMap.remove(seq);
-        resultMap.remove(seq);
     }
 
 }

@@ -5,7 +5,6 @@ import com.rpc.lrpc.Enums.ChannelType;
 import com.rpc.lrpc.Util.MessageUtil;
 import com.rpc.lrpc.message.RpcAddress;
 import io.netty.channel.ChannelHandler;
-import io.netty.channel.ChannelInitializer;
 import io.netty.channel.DefaultEventLoopGroup;
 import io.netty.channel.EventLoopGroup;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,15 +13,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.stereotype.Component;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 @Component
 @ConditionalOnBean(RpcConsumer.class)
-public class ChannelPool {
+public class ConsumerChannelPool {
 
     //连接池，key为连接地址，value是连接
-    private volatile ConcurrentHashMap<String,ConsumerClient> connectionPool;
+    private volatile ConcurrentHashMap<String, ConsumerToProviderClient> connectionPool;
 
     //连接锁，防止connection重复创建
     private volatile ConcurrentHashMap<String,Object> connectionLocks=new ConcurrentHashMap<>();
@@ -34,7 +32,6 @@ public class ChannelPool {
     @Qualifier("group")
     EventLoopGroup group;
 
-    ChannelInitializer<?> channelInitializer;
     @Autowired
     @Qualifier("workerGroup")
     DefaultEventLoopGroup defaultEventLoopGroup;
@@ -47,7 +44,7 @@ public class ChannelPool {
     List<ChannelHandler> handlers;
 
     //TODO clientImpl的class需要设置吗
-    public ConsumerClient getConsumerConnection(String address) {
+    public ConsumerToProviderClient getConsumerConnection(String address) {
         if (connectionPool==null) {
             synchronized (this) {
                 if (connectionPool==null) {
@@ -56,7 +53,7 @@ public class ChannelPool {
             }
         }
 
-        ConsumerClient connection = connectionPool.get(address);
+        ConsumerToProviderClient connection = connectionPool.get(address);
         if (connection!=null) {
             return connection;
         }
@@ -66,19 +63,16 @@ public class ChannelPool {
             connectionLocks.putIfAbsent(address,new Object());
         }
         synchronized (connectionLocks.get(address)) {
-            ConsumerClient client = connectionPool.get(address);
+            ConsumerToProviderClient client = connectionPool.get(address);
             if (client!=null) {
                 return client;
             }
 
-            if (channelInitializer==null) {
-                channelInitializer=new RpcClientChannelInitializer(handlers,new ChannelResponse());
-            }
-            ConsumerClient consumerClient = new ConsumerClient(group, defaultEventLoopGroup, handlers, requestTimeOut);
+            ConsumerToProviderClient consumerToProviderClient = new ConsumerToProviderClient(group, defaultEventLoopGroup, handlers, requestTimeOut);
             //连接初始化
             RpcAddress url = MessageUtil.parseAddress(address);
-            consumerClient.init(url.getHost(),url.getPort(), ChannelType.ToChannelClass(channelType));
-            connectionPool.put(address,consumerClient);
+            consumerToProviderClient.init(url.getHost(),url.getPort(), ChannelType.ToChannelClass(channelType));
+            connectionPool.put(address, consumerToProviderClient);
         }
         return  connectionPool.get(address);
     }

@@ -1,5 +1,7 @@
 package com.rpc.lrpc;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rpc.lrpc.Context.RPCServiceProvider;
 import com.rpc.lrpc.Context.RpcConsumer;
 import com.rpc.lrpc.Context.RpcRegister;
@@ -11,7 +13,7 @@ import com.rpc.lrpc.message.Content.Request.DefaultPullServicesRequest;
 import com.rpc.lrpc.message.Content.Request.PullServicesRequest;
 import com.rpc.lrpc.message.Content.Response.DefaultPullServicesResponse;
 import com.rpc.lrpc.message.Content.Response.PullServicesResponse;
-import com.rpc.lrpc.net.RPCRequestSender;
+import com.rpc.lrpc.net.ChannelResponse;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.embedded.EmbeddedChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
@@ -50,8 +52,7 @@ public class LRpcApplicationTests {
         System.out.println(address.getPort());
         System.out.println(address.getServiceName());
     }
-    @Autowired
-    RPCRequestSender sender;
+
     @Autowired
     RpcConsumer consumer;
 
@@ -82,6 +83,7 @@ public class LRpcApplicationTests {
 
         EmbeddedChannel channel = new EmbeddedChannel(list.toArray(new ChannelHandler[0]));
         channel.attr(AttributeKey.valueOf(MessageUtil.SEQ_COUNTER_NAME)).set(new AtomicInteger(1));
+        channel.attr(AttributeKey.valueOf(MessageUtil.CHANNEL_RESPONSE_MAP)).set(new ChannelResponse());
         return channel;
     }
 
@@ -113,8 +115,7 @@ public class LRpcApplicationTests {
         }
     }
 
-    @Autowired
-    ResponseMap map;
+
     @Test
     void testConsumerSericeList()
     {
@@ -131,7 +132,7 @@ public class LRpcApplicationTests {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        System.out.println(sender.callSync("rpc://nihao:test", "123"));
+        //System.out.println(sender.callSync("rpc://nihao:test", "123"));
     }
 
     @Test
@@ -153,5 +154,10 @@ public class LRpcApplicationTests {
 
             System.out.println(address);
         }
+    }
+
+    @Test
+    void name() throws JsonProcessingException {
+        System.out.println(new ObjectMapper().writeValueAsString(new DefaultPullServicesResponse()));
     }
 }

@@ -19,6 +19,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 @ConditionalOnBean(RPCServiceProvider.class)
@@ -26,10 +27,10 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class ProviderClient extends Client {
     private boolean isInit=false;
-    @Value("${RPC.Config.RequestTimeOut}")
-    long requestTimeOut;
+
+
     @Autowired
-    public ProviderClient(EventLoopGroup group, DefaultEventLoopGroup workerGroup, List<ChannelHandler> handlers) {
+    public ProviderClient(EventLoopGroup group, DefaultEventLoopGroup workerGroup, List<ChannelHandler> handlers,@Value("${RPC.Config.RequestTimeOut}") long requestTimeOut) {
         super(group, workerGroup, handlers, requestTimeOut);
     }
     @Autowired
@@ -40,21 +41,17 @@ public class ProviderClient extends Client {
         {
             isInit=true;
             super.init(provider.getRegisterServerHost(), provider.getRegisterServerPort(), ChannelType.ToChannelClass(provider.getChannelType()));
+            register();
+            workerGroup.scheduleAtFixedRate(()->{
+                DokiDokiRequest request = new DokiDokiRequest();
+                request.setRpcAddress(provider.getRpcUrl());
+                channel.writeAndFlush(new RequestMessage<>(
+                        CommandType.DokiDoki, MessageType.request, request
+                ));
+            },0,provider.getHeartGap(), TimeUnit.SECONDS);
         }
     }
 
-    @Override
-    void channelInit() {
-        super.channelInit();
-        register();
-        workerGroup.scheduleAtFixedRate(()->{
-            DokiDokiRequest request = new DokiDokiRequest();
-            request.setRpcAddress(provider.getRpcUrl());
-            channel.writeAndFlush(new RequestMessage<>(
-                    CommandType.DokiDoki, MessageType.request, request
-            ));
-        },0,provider.getHeartGap(), TimeUnit.SECONDS);
-    }
 
     void register()
     {

@@ -15,6 +15,7 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.context.annotation.Scope;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Component;
 @ConditionalOnBean(RpcConsumer.class)
 @Component
 @Slf4j
+
 @ChannelHandler.Sharable
 public class DeleteServiceRquestHandler extends SimpleChannelInboundHandler<RequestMessage<DeleteServiceRequest>> {
 

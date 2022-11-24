@@ -23,11 +23,10 @@ public class RpcClientChannelInitializer extends ChannelInitializer<Channel> {
 
     List<ChannelHandler> handlersChain;
 
-    ChannelResponse channelResponse;
 
-    public RpcClientChannelInitializer(List<ChannelHandler> handlersChain, ChannelResponse channelResponse) {
+
+    public RpcClientChannelInitializer(List<ChannelHandler> handlersChain) {
         this.handlersChain = handlersChain;
-        this.channelResponse = channelResponse;
     }
 
     @Override
@@ -39,6 +38,6 @@ public class RpcClientChannelInitializer extends ChannelInitializer<Channel> {
         pipeline.addLast(handlersChain.toArray(new ChannelHandler[0]));
         //设置计数器
         ch.attr(AttributeKey.valueOf(MessageUtil.SEQ_COUNTER_NAME)).set(new AtomicInteger(1));
-        ch.attr(AttributeKey.valueOf(MessageUtil.CHANNEL_RESPONSE_MAP)).set(channelResponse);
+        ch.attr(AttributeKey.valueOf(MessageUtil.CHANNEL_RESPONSE_MAP)).set(new ChannelResponse());
     }
 }

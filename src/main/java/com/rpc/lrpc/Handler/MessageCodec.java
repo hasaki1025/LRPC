@@ -6,11 +6,16 @@ import com.rpc.lrpc.Exception.IncorrectMagicNumberException;
 import com.rpc.lrpc.Util.MessageUtil;
 import com.rpc.lrpc.message.DefaultMessage;
 import com.rpc.lrpc.message.Message;
+import com.rpc.lrpc.net.ChannelResponse;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageCodec;
+import io.netty.util.Attribute;
+import io.netty.util.AttributeKey;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -18,11 +23,10 @@ import java.util.List;
 @ChannelHandler.Sharable
 @Component
 @Order(0)
-
+@Slf4j
 public class MessageCodec extends MessageToMessageCodec<ByteBuf,DefaultMessage> {
 
-    @Autowired
-    ResponseMap responseMap;
+
 
 
     @Override
@@ -30,13 +34,14 @@ public class MessageCodec extends MessageToMessageCodec<ByteBuf,DefaultMessage> 
         ByteBuf buffer = ctx.alloc().buffer();
         MessageUtil.messageToByteBuf(msg,buffer);
         if (msg.getMessageType().equals(MessageType.request)
-                && !msg.getCommandType().equals(CommandType.DokiDoki)
-                && !msg.getCommandType().equals(CommandType.Call)
-                && !msg.getCommandType().equals(CommandType.Pull))
+                && !msg.getCommandType().equals(CommandType.DokiDoki))
         {
             //需要等待的响应
             //心跳发送不需要响应
-            responseMap.addWaitingRequest(msg.getSeq());
+            Attribute<Object> attr = ctx.channel().attr(AttributeKey.valueOf(MessageUtil.CHANNEL_RESPONSE_MAP));
+            ChannelResponse channelResponse = (ChannelResponse) attr.get();
+            log.info("channelResponseMap : {}",channelResponse);
+            channelResponse.addWaitRequest(msg.getSeq());
         }
         out.add(buffer);
     }
@@ -48,13 +53,12 @@ public class MessageCodec extends MessageToMessageCodec<ByteBuf,DefaultMessage> 
             Message message = MessageUtil.byteToMessage(msg);
             if (message.getMessageType().equals(MessageType.response))
             {
+                ChannelResponse responseMap = (ChannelResponse) ctx.channel().attr(AttributeKey.valueOf(MessageUtil.CHANNEL_RESPONSE_MAP)).get();
                 //序号检查
                 if (!responseMap.stillWaiting(message.getSeq())) {
                     throw new RuntimeException("not match Request of this Response");
                 }
-                if (!message.getCommandType().equals(CommandType.Call)) {
-                    responseMap.removeWaitingRequest(message.getSeq());
-                }
+                responseMap.addWaitRequest(message.getSeq());
             }
             out.add(message);
         } catch (IncorrectMagicNumberException e) {

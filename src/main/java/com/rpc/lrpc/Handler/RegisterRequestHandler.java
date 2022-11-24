@@ -21,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.context.annotation.Scope;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -29,6 +30,7 @@ import org.springframework.stereotype.Component;
 @ConditionalOnBean(RpcRegister.class)
 @ChannelHandler.Sharable
 @Order(3)
+
 public class RegisterRequestHandler extends SimpleChannelInboundHandler<RequestMessage<RegisterRequest>> {
 
     @Autowired

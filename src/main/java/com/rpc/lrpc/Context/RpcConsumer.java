@@ -27,4 +27,5 @@ public interface RpcConsumer {
     RpcAddress getRpcAddress(String serviceName);
 
 
+    String getChannelType();
 }
