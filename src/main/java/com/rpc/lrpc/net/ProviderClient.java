@@ -14,6 +14,7 @@ import io.netty.channel.DefaultEventLoopGroup;
 import io.netty.channel.EventLoopGroup;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.stereotype.Component;
 
@@ -25,9 +26,11 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class ProviderClient extends Client {
     private boolean isInit=false;
+    @Value("${RPC.Config.RequestTimeOut}")
+    long requestTimeOut;
     @Autowired
-    public ProviderClient(EventLoopGroup group, DefaultEventLoopGroup workerGroup, List<ChannelHandler> handlers, ResponseMap responseMap) {
-        super(group, workerGroup, handlers, responseMap);
+    public ProviderClient(EventLoopGroup group, DefaultEventLoopGroup workerGroup, List<ChannelHandler> handlers) {
+        super(group, workerGroup, handlers, requestTimeOut);
     }
     @Autowired
     RPCServiceProvider provider;

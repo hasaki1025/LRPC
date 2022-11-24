@@ -41,8 +41,8 @@ public class ChannelPool {
 
     @Autowired
     RpcConsumer rpcConsumer;
-    @Autowired
-    ResponseMap responseMap;
+    @Value("${RPC.Config.RequestTimeOut}")
+    long requestTimeOut;
     @Autowired
     List<ChannelHandler> handlers;
 
@@ -72,9 +72,9 @@ public class ChannelPool {
             }
 
             if (channelInitializer==null) {
-                channelInitializer=new RpcClientChannelInitializer(handlers);
+                channelInitializer=new RpcClientChannelInitializer(handlers,new ChannelResponse());
             }
-            ConsumerClient consumerClient = new ConsumerClient(group, defaultEventLoopGroup, handlers, responseMap);
+            ConsumerClient consumerClient = new ConsumerClient(group, defaultEventLoopGroup, handlers, requestTimeOut);
             //连接初始化
             RpcAddress url = MessageUtil.parseAddress(address);
             consumerClient.init(url.getHost(),url.getPort(), ChannelType.ToChannelClass(channelType));

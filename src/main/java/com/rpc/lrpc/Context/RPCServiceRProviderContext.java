@@ -121,11 +121,12 @@ public class RPCServiceRProviderContext implements RPCServiceProvider{
     }
 
     @Override
-    public Object invokeMapping(Object[] params, String mapping) throws InvocationTargetException, IllegalAccessException {
+    public Object invokeMapping(Object[] params, String mapping) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         RpcMapping rpcMapping = mappingMap.get(mapping);
-        Method source = rpcMapping.getSource();
-        Object bean = applicationContext.getBean(rpcMapping.getClazz());
-        return source.invoke(bean, params);
+        Class<?> clazz = rpcMapping.getClazz();
+        Method method = clazz.getDeclaredMethod(rpcMapping.getMethodName(), rpcMapping.getParamType());
+        Object bean = applicationContext.getBean(clazz);
+        return method.invoke(bean,params);
     }
 
     @Override

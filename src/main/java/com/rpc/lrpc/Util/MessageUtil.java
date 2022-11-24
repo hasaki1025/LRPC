@@ -30,6 +30,8 @@ public class MessageUtil {
     public static  CommandType DEFAULT_COMMANDTYPE;
     public static MessageType messageType;
 
+    public static final String CHANNEL_RESPONSE_MAP="ChannelResponseMap";
+
     public static final String SEQ_COUNTER_NAME ="SeqCounter";
 
     /**

@@ -30,7 +30,7 @@ public interface RPCServiceProvider {
 
     RpcAddress getRpcUrl();
 
-    Object invokeMapping(Object[] params,String mapping) throws InvocationTargetException, IllegalAccessException;
+    Object invokeMapping(Object[] params,String mapping) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException;
 
 
     String getChannelType();

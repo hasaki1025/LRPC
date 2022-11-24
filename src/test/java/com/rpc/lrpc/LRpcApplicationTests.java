@@ -1,16 +1,16 @@
 package com.rpc.lrpc;
 
+import com.rpc.lrpc.Context.RPCServiceProvider;
 import com.rpc.lrpc.Context.RpcConsumer;
+import com.rpc.lrpc.Context.RpcRegister;
 import com.rpc.lrpc.Enums.CommandType;
 import com.rpc.lrpc.Enums.MessageType;
 import com.rpc.lrpc.Util.MessageUtil;
+import com.rpc.lrpc.message.*;
 import com.rpc.lrpc.message.Content.Request.DefaultPullServicesRequest;
 import com.rpc.lrpc.message.Content.Request.PullServicesRequest;
 import com.rpc.lrpc.message.Content.Response.DefaultPullServicesResponse;
-import com.rpc.lrpc.message.RequestMessage;
-import com.rpc.lrpc.message.RpcAddress;
-import com.rpc.lrpc.message.RpcService;
-import com.rpc.lrpc.message.RpcUrl;
+import com.rpc.lrpc.message.Content.Response.PullServicesResponse;
 import com.rpc.lrpc.net.RPCRequestSender;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.embedded.EmbeddedChannel;
@@ -61,44 +61,67 @@ public class LRpcApplicationTests {
 
     @Test
     void testChannelHandler() {
-        ArrayList<ChannelHandler> list = new ArrayList<>();
-        list.add(new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE,12,4,0,0));
-        list.add(new LoggingHandler(LogLevel.INFO));
-        list.addAll(handlerList);
-        for (ChannelHandler handler : handlerList) {
-            System.out.println(handler);
-        }
-
-        EmbeddedChannel channel = new EmbeddedChannel(list.toArray(new ChannelHandler[0]));
-        channel.attr(AttributeKey.valueOf(MessageUtil.SEQ_COUNTER_NAME)).set(new AtomicInteger(1));
+        EmbeddedChannel channel = getEmbeddedChannel();
         PullServicesRequest request = new DefaultPullServicesRequest();
         channel.writeOutbound(new RequestMessage<>(CommandType.Pull, MessageType.request, request));
 
     }
     @Test
     void testChannelHandlerIn() {
+        EmbeddedChannel channel = getEmbeddedChannel();
+        PullServicesRequest request = new DefaultPullServicesRequest();
+        channel.writeInbound(new RequestMessage<>(CommandType.Pull, MessageType.request, request));
+    }
+
+    private EmbeddedChannel getEmbeddedChannel() {
         ArrayList<ChannelHandler> list = new ArrayList<>();
         list.add(new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE,12,4,0,0));
         list.add(new LoggingHandler(LogLevel.INFO));
         list.addAll(handlerList);
-        for (ChannelHandler handler : handlerList) {
-            System.out.println(handler);
-        }
 
 
         EmbeddedChannel channel = new EmbeddedChannel(list.toArray(new ChannelHandler[0]));
         channel.attr(AttributeKey.valueOf(MessageUtil.SEQ_COUNTER_NAME)).set(new AtomicInteger(1));
-        PullServicesRequest request = new DefaultPullServicesRequest();
-        channel.writeInbound(new RequestMessage<>(CommandType.Pull, MessageType.request, request));
-
+        return channel;
     }
 
+
+    @Autowired
+    RpcRegister register;
+    @Autowired
+    RPCServiceProvider rpcServiceProvider;
+    @Test
+    void testRegisterServices() {
+        /*RpcAddress rpcUrl = rpcServiceProvider.getRpcUrl();
+        RpcService rpcService = rpcServiceProvider.getRpcService();
+        DefaultRegisterRequest request = new DefaultRegisterRequest();
+        request.setRpcService(rpcService);
+        request.setRpcAddress(rpcUrl);
+        getEmbeddedChannel()
+                .writeInbound(new RequestMessage<RegisterRequest>(CommandType.Register,MessageType.request,request));*/
+        for (RpcAddress address : register.getAllUrl()) {
+            System.out.println(address);
+        }
+    }
+
+    @Test
+    void testProviderMethod() {
+        System.out.println(rpcServiceProvider.getServiceName());
+
+        for (RpcMapping mapping : rpcServiceProvider.getMappings()) {
+            System.out.println(mapping);
+        }
+    }
+
+    @Autowired
+    ResponseMap map;
     @Test
     void testConsumerSericeList()
     {
         for (RpcAddress address : consumer.getAllAddress()) {
             System.out.println(address);
         }
+
     }
 
     @Test
@@ -109,5 +132,26 @@ public class LRpcApplicationTests {
             throw new RuntimeException(e);
         }
         System.out.println(sender.callSync("rpc://nihao:test", "123"));
+    }
+
+    @Test
+    void testGetPullResponse() {
+        DefaultPullServicesResponse response = new DefaultPullServicesResponse();
+
+
+        Map<RpcService, RpcAddress[]> map=new HashMap<>();
+        map.put( rpcServiceProvider.getRpcService(),new RpcAddress[]{rpcServiceProvider.getRpcUrl()});
+        response.addRpcService(map);
+
+        EmbeddedChannel channel = getEmbeddedChannel();
+        PullServicesRequest request = new DefaultPullServicesRequest();
+        channel.writeOutbound(new RequestMessage<>(CommandType.Pull, MessageType.request, request));
+
+        getEmbeddedChannel()
+                .writeInbound(new ResponseMessage<PullServicesResponse>(CommandType.Pull,MessageType.response,response,1));
+        for (RpcAddress address : consumer.getAllAddress()) {
+
+            System.out.println(address);
+        }
     }
 }

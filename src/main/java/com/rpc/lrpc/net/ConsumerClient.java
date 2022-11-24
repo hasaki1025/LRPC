@@ -35,8 +35,8 @@ public class ConsumerClient extends Client {
     }
 
 
-    public ConsumerClient(EventLoopGroup group, DefaultEventLoopGroup workerGroup, List<ChannelHandler> handlers, ResponseMap responseMap) {
-        super(group, workerGroup, handlers, responseMap);
+    public ConsumerClient(EventLoopGroup group, DefaultEventLoopGroup workerGroup, List<ChannelHandler> handlers,long timeout) {
+        super(group, workerGroup, handlers, timeout);
     }
 
 

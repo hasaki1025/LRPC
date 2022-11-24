@@ -12,9 +12,8 @@ public class RpcMapping {
     Class<?>[] paramType;
 
     Class<?> clazz;
-    String name;
+    String methodName;
 
-    Method source;
 
 
     public RpcMapping(Method method) {
@@ -24,8 +23,7 @@ public class RpcMapping {
             returnType=method.getReturnType();
             paramType=method.getParameterTypes();
             clazz=method.getDeclaringClass();
-            name=method.getName();
-            source=method;
+            methodName=method.getName();
         }
         else {
             throw new RuntimeException();

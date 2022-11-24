@@ -52,7 +52,8 @@ public class CallServiceRequestHandler extends SimpleChannelInboundHandler<Reque
             CallServicesRequest request = msg.content();
             response.setResult(provider.invokeMapping(request.getParamValues(),request.getMapping()));
             log.info("Method Invoke successfully....");
-        } catch (InvocationTargetException | IllegalAccessException e) {
+        } catch (InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
+            e.printStackTrace();
             throw new RuntimeException(e);
         }
         //并没有定义size

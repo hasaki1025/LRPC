@@ -29,14 +29,16 @@ public class Client implements Closeable {
     Channel channel;
     final RpcClientChannelInitializer channelInitializer;
 
+    ChannelResponse channelResponse;
+    long timeout;
 
-     final ResponseMap responseMap;
 
-    public Client(EventLoopGroup group, DefaultEventLoopGroup workerGroup, List<ChannelHandler> handlers, ResponseMap responseMap) {
+    public Client(EventLoopGroup group, DefaultEventLoopGroup workerGroup, List<ChannelHandler> handlers,long timeout) {
         this.group = group;
         this.workerGroup = workerGroup;
-        this.channelInitializer = new RpcClientChannelInitializer(handlers);
-        this.responseMap=responseMap;
+        channelResponse=new ChannelResponse();
+        this.channelInitializer = new RpcClientChannelInitializer(handlers,channelResponse);
+        this.timeout=timeout;
     }
 
     void init(String host, int port, Class<? extends Channel> channelClass)
@@ -70,19 +72,18 @@ public class Client implements Closeable {
         //在这里已经设置了SEQ，之后无需再次设置
         int seq = seqCounter.getAndIncrement();
         message.setSeq(seq);
-        ResponseMap.WAITING_MAP.put(seq, new Object());
+
         channel.writeAndFlush(message);
 
         return workerGroup.submit(() -> {
-            synchronized (ResponseMap.WAITING_MAP.get(seq)) {
-                try {
-                    ResponseMap.WAITING_MAP.get(seq).wait(responseMap.getRequestTimeOut());
-                } catch (InterruptedException e) {
-                    responseMap.removeWaitingRequest(seq);
-                    throw new RuntimeException(e);
-                }
+            try {
+                channelResponse.lock(seq,timeout);
+                return channelResponse.getResponse(seq);
+            } catch (InterruptedException e) {
+                channelResponse.removeWaitingRequest(seq);
+                e.printStackTrace();
+                throw new RuntimeException(e);
             }
-            return responseMap.getResponse(seq);
         });
     }
 
