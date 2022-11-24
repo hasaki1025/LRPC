@@ -1,15 +1,13 @@
 package com.rpc.lrpc.message.Content.Request;
 
 import com.rpc.lrpc.message.RpcService;
-import com.rpc.lrpc.message.RpcURL;
-
-import java.util.Map;
+import com.rpc.lrpc.message.RpcAddress;
 
 public interface PushServicesRequest extends RequestContent{
 
    RpcService getRpcService();
-   RpcURL getRpcURL();
+   RpcAddress getRpcURL();
 
    void setRpcService(RpcService service);
-   void setRpcURL(RpcURL url);
+   void setRpcURL(RpcAddress url);
 }

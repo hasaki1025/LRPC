@@ -3,7 +3,7 @@ package com.rpc.lrpc.net;
 import com.rpc.lrpc.Context.RpcConsumer;
 import com.rpc.lrpc.Enums.ChannelType;
 import com.rpc.lrpc.Util.MessageUtil;
-import com.rpc.lrpc.message.RpcURL;
+import com.rpc.lrpc.message.RpcAddress;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.DefaultEventLoopGroup;
@@ -79,7 +79,7 @@ public class ChannelPool {
                     .getDeclaredConstructor(EventLoopGroup.class, DefaultEventLoopGroup.class, ChannelInitializer.class,RpcConsumer.class,ResponseMap.class)
                     .newInstance(group,defaultEventLoopGroup,channelInitializer,rpcConsumer,responseMap);
             //连接初始化
-            RpcURL url = MessageUtil.getUrlByString(address);
+            RpcAddress url = MessageUtil.parseAddress(address);
             instance.init(url.getHost(),url.getPort(), ChannelType.ToChannelClass(channelType));
             connectionPool.put(address,instance);
         }

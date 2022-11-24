@@ -1,6 +1,6 @@
 package com.rpc.lrpc.message.Content.Response;
 
-import com.rpc.lrpc.message.RpcURL;
+import com.rpc.lrpc.message.RpcAddress;
 import lombok.Data;
 
 @Data
@@ -9,7 +9,7 @@ public class DokiDokiResponse implements ResponseContent {
 
     Exception exception;
 
-    RpcURL rpcURL;
+    RpcAddress rpcAddress;
 
     @Override
     public boolean hasException() {

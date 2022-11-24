@@ -1,18 +1,9 @@
 package com.rpc.lrpc.Handler;
 
-import com.rpc.lrpc.Context.RPCServiceProvider;
 import com.rpc.lrpc.Context.RpcRegister;
-import com.rpc.lrpc.Enums.CommandType;
-import com.rpc.lrpc.Enums.MessageType;
-import com.rpc.lrpc.Enums.RpcRole;
 import com.rpc.lrpc.message.Content.Request.DokiDokiRequest;
-import com.rpc.lrpc.message.Content.Response.DokiDokiResponse;
-import com.rpc.lrpc.message.Content.Response.SimpleResponse;
 import com.rpc.lrpc.message.RequestMessage;
-import com.rpc.lrpc.message.ResponseMessage;
-import com.rpc.lrpc.message.RpcURL;
 import com.rpc.lrpc.net.DokiDokiMap;
-import com.rpc.lrpc.net.ResponseMap;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -22,8 +13,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
-
-import java.net.InetAddress;
 
 @Component
 @ConditionalOnBean(RpcRegister.class)
@@ -41,7 +30,7 @@ public class DokiDokiRequestHandler extends SimpleChannelInboundHandler<RequestM
     protected void channelRead0(ChannelHandlerContext ctx, RequestMessage<DokiDokiRequest> msg) throws Exception {
         try
         {
-            dokiDokiMap.updateOrAddLastDokiTime(msg.content().getRpcURL());
+            dokiDokiMap.updateOrAddLastDokiTime(msg.content().getRpcAddress());
         }catch (Exception e)
         {
             e.printStackTrace();

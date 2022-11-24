@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rpc.lrpc.Enums.CommandType;
 import com.rpc.lrpc.Enums.MessageType;
-import com.rpc.lrpc.Enums.RpcRole;
 import com.rpc.lrpc.Enums.SerializableType;
 import com.rpc.lrpc.Exception.IncorrectMagicNumberException;
 import com.rpc.lrpc.message.*;
@@ -176,7 +175,7 @@ public class MessageUtil {
 
 
 
-    public static RpcURL getUrlByString(String address)
+    public static RpcAddress getUrlByString(String address)
     {
         if (!address.startsWith("rpc://") || !address.contains(":"))
         {
@@ -188,15 +187,19 @@ public class MessageUtil {
         {
             throw new RuntimeException("Not correct URL");
         }
-        RpcURL url = new RpcURL();
+        RpcAddress url = new RpcAddress();
         url.setHost(split[0]);
         url.setPort(Integer.parseInt(split[1]));
         return url;
     }
 
-    public static String[] parseAddress(String address)
+    /**
+     * 解析Rpc请求地址如:rpc://ip:端口/服务名称/mapping
+     * @param address RPC请求地址
+     * @return 拆分后的地址
+     */
+    public static RpcAddress parseAddress(String address)
     {
-        String[] result = new String[3];
         if (!address.startsWith("rpc://") || !address.contains(":"))
         {
             throw new RuntimeException("Not correct URL");
@@ -207,18 +210,9 @@ public class MessageUtil {
         {
             throw new RuntimeException("Not correct URL");
         }
-        result[0]=split[0];
-        String portAndMapping=split[1];
-        if (!portAndMapping.contains("/"))
-        {
-            result[1]=portAndMapping;
-            result[2]="";
-            return result;
-        }
-        int i = portAndMapping.indexOf("/");
-        result[1]=portAndMapping.substring(0,i);
-        result[2] = portAndMapping.substring(i);
-        return result;
+        String host=split[0];
+        String port=split[1];
+        return new RpcAddress(host,Integer.parseInt(port));
     }
 
 

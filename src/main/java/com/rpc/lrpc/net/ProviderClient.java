@@ -12,7 +12,6 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.DefaultEventLoopGroup;
 import io.netty.channel.EventLoopGroup;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.stereotype.Component;
 
@@ -37,7 +36,7 @@ public class ProviderClient extends Client {
             super.init(provider.getRegisterServerHost(), provider.getRegisterServerPort(), ChannelType.ToChannelClass(provider.getChannelType()));
             workerGroup.scheduleAtFixedRate(()->{
                 DokiDokiRequest request = new DokiDokiRequest();
-                request.setRpcURL(provider.getRpcUrl());
+                request.setRpcAddress(provider.getRpcUrl());
                 channel.writeAndFlush(new RequestMessage<>(
                         CommandType.DokiDoki, MessageType.request, request
                 ));
@@ -49,7 +48,7 @@ public class ProviderClient extends Client {
     {
         DefaultRegisterRequest request = new DefaultRegisterRequest();
         request.setRpcService(provider.getRpcService());
-        request.setRpcURL(provider.getRpcUrl());
+        request.setRpcAddress(provider.getRpcUrl());
         channel.writeAndFlush(new RequestMessage<RegisterRequest>(CommandType.Register, MessageType.request, request));
     }
 

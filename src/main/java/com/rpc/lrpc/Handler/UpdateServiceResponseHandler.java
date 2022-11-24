@@ -4,7 +4,7 @@ import com.rpc.lrpc.Context.RpcConsumer;
 import com.rpc.lrpc.message.Content.Response.UpdateServiceResponse;
 import com.rpc.lrpc.message.ResponseMessage;
 import com.rpc.lrpc.message.RpcService;
-import com.rpc.lrpc.message.RpcURL;
+import com.rpc.lrpc.message.RpcAddress;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -30,9 +30,9 @@ public class UpdateServiceResponseHandler extends SimpleChannelInboundHandler<Re
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ResponseMessage<UpdateServiceResponse> msg) throws Exception {
         if (!msg.content().hasException()) {
-            RpcURL[] urls = msg.content().getRpcUrls();
+            RpcAddress[] urls = msg.content().getRpcUrls();
             RpcService rpcService = msg.content().getRpcService();
-            HashMap<RpcService, RpcURL[]> map = new HashMap<>();
+            HashMap<RpcService, RpcAddress[]> map = new HashMap<>();
             map.put(rpcService,urls);
             rpcConsumer.addServices(map);
         }

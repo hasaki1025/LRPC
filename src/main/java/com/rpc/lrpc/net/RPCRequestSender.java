@@ -1,6 +1,8 @@
 package com.rpc.lrpc.net;
 
+import com.rpc.lrpc.Context.RpcConsumer;
 import com.rpc.lrpc.Util.MessageUtil;
+import com.rpc.lrpc.message.RpcAddress;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.stereotype.Component;
@@ -14,13 +16,18 @@ public class RPCRequestSender {
     @Autowired
     ChannelPool channelPool;
 
-    public  Object callSync(String address,Object...params)
+    @Autowired
+    RpcConsumer consumer;
+
+    public  Object callSync(String url,Object...params)
     {
         try {
-            String[] strings = MessageUtil.parseAddress(address);
-            String replace = address.replace(strings[2], "");
-            ConsumerClient client = channelPool.getConnection(replace, ConsumerClient.class);
-            return client.callSync(params, strings[2]);
+            RpcAddress rpcAddress = MessageUtil.parseAddress(address);
+            if (!consumer.containAddress(rpcAddress)) {
+
+            }
+            ConsumerClient client = channelPool.getConnection(address, ConsumerClient.class);
+            return client.callSync(params, rpcAddress.getMapping());
         } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
@@ -28,10 +35,9 @@ public class RPCRequestSender {
     public  <T>void call(String address, Consumer<T> consumer, Object...params)
     {
         try {
-            String[] strings = MessageUtil.parseAddress(address);
-            String replace = address.replace(strings[2], "");
-            ConsumerClient client = channelPool.getConnection(replace, ConsumerClient.class);
-            client.call(params, strings[2],consumer);
+            RpcAddress rpcAddress = MessageUtil.parseAddress(address);
+            ConsumerClient client = channelPool.getConnection(address, ConsumerClient.class);
+            client.call(params, rpcAddress.getMapping(),consumer);
         } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }

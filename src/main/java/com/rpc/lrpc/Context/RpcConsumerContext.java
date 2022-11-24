@@ -2,7 +2,7 @@ package com.rpc.lrpc.Context;
 
 import com.rpc.lrpc.message.RpcMapping;
 import com.rpc.lrpc.message.RpcService;
-import com.rpc.lrpc.message.RpcURL;
+import com.rpc.lrpc.message.RpcAddress;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -30,20 +30,20 @@ public class RpcConsumerContext implements RpcConsumer {
      final Map<String,RpcService> serviceMap=new ConcurrentHashMap<>();
 
      final Set<RpcMapping> mappings=new HashSet<>();
-     final Set<RpcURL> urls=new CopyOnWriteArraySet<>();
+     final Set<RpcAddress> urls=new CopyOnWriteArraySet<>();
 
     @Override
-    public void addService(RpcService service,RpcURL rpcURL) {
+    public void addService(RpcService service, RpcAddress rpcAddress) {
         serviceMap.put(service.getServiceName(),service);
         mappings.addAll(Arrays.asList(service.getRpcMappings()));
-        urls.add(rpcURL);
+        urls.add(rpcAddress);
     }
 
     @Override
-    public void addServices(Map<RpcService, RpcURL[]> service) {
-        for (Map.Entry<RpcService, RpcURL[]> entry : service.entrySet()) {
-            for (RpcURL rpcURL : entry.getValue()) {
-                addService(entry.getKey(),rpcURL);
+    public void addServices(Map<RpcService, RpcAddress[]> service) {
+        for (Map.Entry<RpcService, RpcAddress[]> entry : service.entrySet()) {
+            for (RpcAddress rpcAddress : entry.getValue()) {
+                addService(entry.getKey(), rpcAddress);
             }
         }
     }
@@ -54,6 +54,11 @@ public class RpcConsumerContext implements RpcConsumer {
     public RpcMapping getRpcMappingByName(String mapping) {
         Optional<RpcMapping> first = mappings.stream().filter(x -> x.getMapping().equals(mapping)).findFirst();
         return first.orElse(null);
+    }
+
+    @Override
+    public boolean containAddress(RpcAddress rpcAddress) {
+        return urls.contains(rpcAddress);
     }
 
 

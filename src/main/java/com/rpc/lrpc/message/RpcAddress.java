@@ -3,18 +3,23 @@ package com.rpc.lrpc.message;
 import lombok.Data;
 
 @Data
-public class RpcURL {
+public class RpcAddress {
     String host;
     int port;
-    String serviceName;
+    String serviceName="";
 
-    public RpcURL(String host, int port, String serviceName) {
+    public RpcAddress(String host, int port) {
+        this.host = host;
+        this.port = port;
+    }
+
+    public RpcAddress(String host, int port, String serviceName) {
         this.host = host;
         this.port = port;
         this.serviceName = serviceName;
     }
 
-    public RpcURL() {
+    public RpcAddress() {
     }
 
     @Override

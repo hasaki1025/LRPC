@@ -11,6 +11,7 @@ import com.rpc.lrpc.message.Content.Response.DefaultCallServicesResponse;
 import com.rpc.lrpc.message.RequestMessage;
 import com.rpc.lrpc.message.ResponseMessage;
 import com.rpc.lrpc.message.RpcMapping;
+import com.rpc.lrpc.net.ChannelPool;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -36,8 +37,6 @@ public class CallServiceRequestHandler extends SimpleChannelInboundHandler<Reque
     RPCServiceProvider provider;
 
 
-    @Value("${RPC.Config.SerializableType}")
-    String serializableType;
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, RequestMessage<CallServicesRequest> msg) {
@@ -46,7 +45,6 @@ public class CallServiceRequestHandler extends SimpleChannelInboundHandler<Reque
         try {
             log.info("get Call ServicesRequest:{}",msg);
             CallServicesRequest request = msg.content();
-            //TODO 同步update请求服务列表并再次发起Call请求
             response.setResult(provider.invokeMapping(request.getParamValues(),request.getMapping()));
             log.info("Method Invoke successfully....");
         } catch (InvocationTargetException | IllegalAccessException e) {

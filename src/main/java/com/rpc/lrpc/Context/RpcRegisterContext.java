@@ -1,7 +1,7 @@
 package com.rpc.lrpc.Context;
 
 import com.rpc.lrpc.message.RpcService;
-import com.rpc.lrpc.message.RpcURL;
+import com.rpc.lrpc.message.RpcAddress;
 import com.rpc.lrpc.net.DokiDokiMap;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.BiFunction;
 
 @Data
 @ConditionalOnProperty(name = {
@@ -19,7 +18,7 @@ import java.util.function.BiFunction;
 })
 @Component
 public class RpcRegisterContext implements RpcRegister {
-     final Map<RpcService,RpcURL[]> rpcServiceMap=new ConcurrentHashMap<>();
+     final Map<RpcService, RpcAddress[]> rpcServiceMap=new ConcurrentHashMap<>();
      final Map<String,RpcService> serviceNameMap=new ConcurrentHashMap<>();
 
      @Value("${RPC.Register.port}")
@@ -31,18 +30,18 @@ public class RpcRegisterContext implements RpcRegister {
 
 
     @Override
-    public void registerService(RpcService service, RpcURL rpcURL) {
+    public void registerService(RpcService service, RpcAddress rpcAddress) {
         if (rpcServiceMap.containsKey(service))
         {
-            ArrayList<RpcURL> urls = new ArrayList<>(List.of(rpcServiceMap.get(service)));
-            urls.add(rpcURL);
-            rpcServiceMap.put(service,urls.toArray(new RpcURL[0]));
+            ArrayList<RpcAddress> urls = new ArrayList<>(List.of(rpcServiceMap.get(service)));
+            urls.add(rpcAddress);
+            rpcServiceMap.put(service,urls.toArray(new RpcAddress[0]));
         }
         else {
-            rpcServiceMap.put(service,new RpcURL[]{rpcURL});
+            rpcServiceMap.put(service,new RpcAddress[]{rpcAddress});
             serviceNameMap.put(service.getServiceName(),service);
         }
-        dokiDokiMap.addUrl(rpcURL);
+        dokiDokiMap.addUrl(rpcAddress);
     }
 
     @Override
@@ -51,22 +50,22 @@ public class RpcRegisterContext implements RpcRegister {
     }
 
     @Override
-    public RpcURL[] getRpcUrls(RpcService rpcService) {
+    public RpcAddress[] getRpcUrls(RpcService rpcService) {
         return rpcServiceMap.get(rpcService);
     }
 
     @Override
-    public RpcURL[] getRpcUrlsByName(String serviceName) {
+    public RpcAddress[] getRpcUrlsByName(String serviceName) {
         return rpcServiceMap.get(serviceNameMap.get(serviceName));
     }
 
     @Override
-    public RpcURL[] getAllUrl() {
-        ArrayList<RpcURL> urls = new ArrayList<>();
+    public RpcAddress[] getAllUrl() {
+        ArrayList<RpcAddress> urls = new ArrayList<>();
         for (RpcService value : serviceNameMap.values()) {
             urls.addAll(List.of(rpcServiceMap.get(value)));
         }
-        return urls.toArray(new RpcURL[0]);
+        return urls.toArray(new RpcAddress[0]);
     }
 
 

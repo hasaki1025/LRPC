@@ -3,15 +3,15 @@ package com.rpc.lrpc.message.Content.Response;
 
 
 import com.rpc.lrpc.message.RpcService;
-import com.rpc.lrpc.message.RpcURL;
+import com.rpc.lrpc.message.RpcAddress;
 
 import java.util.Map;
 
 
 public interface PullServicesResponse extends ResponseContent{
 
-    Map<RpcService,RpcURL[]> getRpcServiceMap();
-    void addRpcService(Map<RpcService,RpcURL[]> map);
+    Map<RpcService, RpcAddress[]> getRpcServiceMap();
+    void addRpcService(Map<RpcService, RpcAddress[]> map);
 }
 
 

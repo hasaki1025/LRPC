@@ -47,7 +47,7 @@ public class RegisterRequestHandler extends SimpleChannelInboundHandler<RequestM
             workerGroup.submit(()->{
                 DefaultPushServicesRequest request = new DefaultPushServicesRequest();
                 request.setRpcService(msg.content().getRpcService());
-                request.setRpcURL(msg.content().getRpcURL());
+                request.setRpcAddress(msg.content().getRpcURL());
                 RegisterServer.broadcastMessage(new RequestMessage<PushServicesRequest>(CommandType.Push,MessageType.request,request));
             });
         }catch (Exception e)

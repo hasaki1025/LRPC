@@ -1,23 +1,20 @@
 package com.rpc.lrpc.net;
 
-import com.rpc.lrpc.message.RpcURL;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.rpc.lrpc.message.RpcAddress;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
 import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class DokiDokiMap {
 
-    private final ConcurrentHashMap<RpcURL, Long> dokodoki=new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<RpcAddress, Long> dokodoki=new ConcurrentHashMap<>();
 
 
     @Value("${RPC.Config.ExpireTime}")
     long expireTime;
 
-    public boolean checkUrlIsExpire(RpcURL url)
+    public boolean checkUrlIsExpire(RpcAddress url)
     {
         long lastDokiTime = dokodoki.get(url);
         if (System.currentTimeMillis()-lastDokiTime>expireTime*1000)
@@ -28,19 +25,19 @@ public class DokiDokiMap {
         return true;
     }
 
-    public void updateOrAddLastDokiTime(RpcURL url)
+    public void updateOrAddLastDokiTime(RpcAddress url)
     {
         dokodoki.put(url,System.currentTimeMillis());
     }
 
-    public void addAllUrl(RpcURL[] urls)
+    public void addAllUrl(RpcAddress[] urls)
     {
-        for (RpcURL url : urls) {
+        for (RpcAddress url : urls) {
             dokodoki.put(url,System.currentTimeMillis());
         }
     }
 
-    public void addUrl(RpcURL url)
+    public void addUrl(RpcAddress url)
     {
         dokodoki.put(url,System.currentTimeMillis());
     }
