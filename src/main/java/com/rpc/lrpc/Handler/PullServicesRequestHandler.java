@@ -7,6 +7,7 @@ import com.rpc.lrpc.Enums.RpcRole;
 import com.rpc.lrpc.message.Content.Request.PullServicesRequest;
 import com.rpc.lrpc.message.Content.Response.DefaultPullServicesResponse;
 import com.rpc.lrpc.message.Content.Response.PullServicesResponse;
+import com.rpc.lrpc.message.Message;
 import com.rpc.lrpc.message.RequestMessage;
 import com.rpc.lrpc.message.ResponseMessage;
 import com.rpc.lrpc.net.Server;
@@ -26,6 +27,10 @@ import org.springframework.stereotype.Component;
 public class PullServicesRequestHandler extends SimpleChannelInboundHandler<RequestMessage<PullServicesRequest>> {
     @Autowired
     RpcRegister rpcRegister;
+    @Override
+    public boolean acceptInboundMessage(Object msg) throws Exception {
+        return super.acceptInboundMessage(msg) && ((Message) msg).getCommandType().equals(CommandType.Pull);
+    }
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, RequestMessage<PullServicesRequest> msg) throws Exception {
         PullServicesResponse response = new DefaultPullServicesResponse();

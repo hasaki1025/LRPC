@@ -24,6 +24,7 @@ import org.springframework.stereotype.Component;
 public class SimpleResonseHandler extends SimpleChannelInboundHandler<ResponseMessage<SimpleResponse>> {
     @Autowired
     ResponseMap responseMap;
+
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ResponseMessage<SimpleResponse> msg) throws Exception {
         log.info("[{}] Request get Response",msg.getSeq());

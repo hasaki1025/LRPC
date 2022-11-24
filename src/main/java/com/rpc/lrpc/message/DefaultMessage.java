@@ -4,6 +4,8 @@ import com.rpc.lrpc.Enums.CommandType;
 import com.rpc.lrpc.Enums.MessageType;
 import com.rpc.lrpc.Enums.RpcRole;
 import com.rpc.lrpc.Enums.SerializableType;
+import lombok.Data;
+
 
 public class DefaultMessage extends AbstractMessage {
 

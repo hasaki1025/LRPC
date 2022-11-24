@@ -2,7 +2,9 @@ package com.rpc.lrpc.message.Content.Request;
 
 import com.rpc.lrpc.message.RpcAddress;
 import com.rpc.lrpc.message.RpcService;
+import lombok.Data;
 
+@Data
 public class DefaultDeleteServiceRequest implements DeleteServiceRequest {
     RpcAddress address;
 

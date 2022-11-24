@@ -6,7 +6,7 @@ import com.rpc.lrpc.Annotation.RPCMapping;
 @RPCController
 public class TestController {
 
-    @RPCMapping("/test")
+    @RPCMapping("test")
     public String gg(String a)
     {
         System.out.println("shabi");

@@ -8,9 +8,11 @@ import com.rpc.lrpc.message.Content.Request.DefaultRegisterRequest;
 import com.rpc.lrpc.message.Content.Request.DokiDokiRequest;
 import com.rpc.lrpc.message.Content.Request.RegisterRequest;
 import com.rpc.lrpc.message.RequestMessage;
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.DefaultEventLoopGroup;
 import io.netty.channel.EventLoopGroup;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.stereotype.Component;
@@ -20,6 +22,7 @@ import java.util.concurrent.TimeUnit;
 
 @ConditionalOnBean(RPCServiceProvider.class)
 @Component
+@Slf4j
 public class ProviderClient extends Client {
     private boolean isInit=false;
     @Autowired
@@ -34,14 +37,20 @@ public class ProviderClient extends Client {
         {
             isInit=true;
             super.init(provider.getRegisterServerHost(), provider.getRegisterServerPort(), ChannelType.ToChannelClass(provider.getChannelType()));
-            workerGroup.scheduleAtFixedRate(()->{
-                DokiDokiRequest request = new DokiDokiRequest();
-                request.setRpcAddress(provider.getRpcUrl());
-                channel.writeAndFlush(new RequestMessage<>(
-                        CommandType.DokiDoki, MessageType.request, request
-                ));
-            },0,provider.getHeartGap(), TimeUnit.SECONDS);
         }
+    }
+
+    @Override
+    void channelInit() {
+        super.channelInit();
+        register();
+        workerGroup.scheduleAtFixedRate(()->{
+            DokiDokiRequest request = new DokiDokiRequest();
+            request.setRpcAddress(provider.getRpcUrl());
+            channel.writeAndFlush(new RequestMessage<>(
+                    CommandType.DokiDoki, MessageType.request, request
+            ));
+        },0,provider.getHeartGap(), TimeUnit.SECONDS);
     }
 
     void register()
@@ -49,7 +58,9 @@ public class ProviderClient extends Client {
         DefaultRegisterRequest request = new DefaultRegisterRequest();
         request.setRpcService(provider.getRpcService());
         request.setRpcAddress(provider.getRpcUrl());
-        channel.writeAndFlush(new RequestMessage<RegisterRequest>(CommandType.Register, MessageType.request, request));
+        //TODO 当发送了注册请求后，注册中心并没有那么快收到，但是服务消费者在此之前发送了一个PULL服务列表的请求，并发起了一个Call服务请求,但是服务消费者并没有保存该服务的地址
+        sendMessage(new RequestMessage<RegisterRequest>(CommandType.Register, MessageType.request, request))
+                .addListener(future -> log.info("register successfullty..."));
     }
 
 }

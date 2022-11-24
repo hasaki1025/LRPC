@@ -22,6 +22,10 @@ public class RpcAddress {
     public RpcAddress() {
     }
 
+    public RpcAddress(String serviceName) {
+        this.serviceName = serviceName;
+    }
+
     @Override
     public String toString() {
         return "rpc://"+host+":"+port;

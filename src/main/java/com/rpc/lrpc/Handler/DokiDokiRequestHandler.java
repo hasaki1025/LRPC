@@ -1,7 +1,9 @@
 package com.rpc.lrpc.Handler;
 
 import com.rpc.lrpc.Context.RpcRegister;
+import com.rpc.lrpc.Enums.CommandType;
 import com.rpc.lrpc.message.Content.Request.DokiDokiRequest;
+import com.rpc.lrpc.message.Message;
 import com.rpc.lrpc.message.RequestMessage;
 import com.rpc.lrpc.net.DokiDokiMap;
 import io.netty.channel.ChannelHandler;
@@ -26,6 +28,10 @@ public class DokiDokiRequestHandler extends SimpleChannelInboundHandler<RequestM
 
     @Autowired
     DokiDokiMap dokiDokiMap;
+    @Override
+    public boolean acceptInboundMessage(Object msg) throws Exception {
+        return super.acceptInboundMessage(msg) && ((Message) msg).getCommandType().equals(CommandType.DokiDoki);
+    }
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, RequestMessage<DokiDokiRequest> msg) throws Exception {
         try

@@ -4,11 +4,14 @@ import com.rpc.lrpc.Context.RpcConsumer;
 import com.rpc.lrpc.Util.MessageUtil;
 import com.rpc.lrpc.message.RpcAddress;
 import com.rpc.lrpc.message.RpcUrl;
+import io.netty.channel.Channel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
 @ConditionalOnBean(ChannelPool.class)
@@ -20,29 +23,41 @@ public class RPCRequestSender {
     @Autowired
     RpcConsumer consumer;
 
-    //TODO 用户调用的时候是不知道IP和端口的，应该换成服务名称和Mapping,URL格式有问题
-    public  Object callSync(String url,Object...params)
-    {
-        try {
-            RpcUrl rpcUrl = MessageUtil.parseUrl(url);
-            if (!consumer.containAddress(rpcUrl.getAddress())) {
-                throw new RuntimeException("Can not find addess of this service");
-            }
-            else {
-                ConsumerClient client = channelPool.getConnection(rpcUrl.getAddress().toString(), ConsumerClient.class);
-                return client.callSync(params, rpcUrl.getMapping());
-            }
-        } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
-            throw new RuntimeException(e);
+    ConsumerClient registerChannel;
+
+    private volatile boolean isInit=false;
+
+    public void init() throws ExecutionException, InterruptedException {
+        if (!isInit)
+        {
+            isInit=true;
+            ConsumerClient client = channelPool.getConsumerConnection("rpc://" + consumer.getRegisterServerHost() + ":" + consumer.getRegisterServerPort());
+            client.pull();
+            registerChannel=client;
         }
     }
-    public  <T>void call(String url, Consumer<T> consumer, Object...params)
+
+    public Optional<Object> callSync(String url, Object...params)
     {
         try {
             RpcUrl rpcUrl = MessageUtil.parseUrl(url);
-            ConsumerClient client = channelPool.getConnection(rpcUrl.getAddress().toString(), ConsumerClient.class);
-            client.call(params, rpcUrl.getMapping(),consumer);
-        } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
+            RpcAddress rpcAddress = consumer.getRpcAddress(rpcUrl.getAddress().getServiceName());
+            ConsumerClient client = channelPool.getConsumerConnection(rpcAddress.toString());
+            return client.callSync(params, rpcUrl.getMapping());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return Optional.empty();
+    }
+    public  <T>void call(String url, Consumer<T> resultConsumer, Object...params)
+    {
+        try {
+            RpcUrl rpcUrl = MessageUtil.parseUrl(url);
+            RpcAddress rpcAddress = consumer.getRpcAddress(rpcUrl.getAddress().getServiceName());
+            rpcUrl.setAddress(rpcAddress);
+            ConsumerClient client = channelPool.getConsumerConnection(rpcUrl.getAddress().toString());
+            client.call(params, rpcUrl.getMapping(),resultConsumer);
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }

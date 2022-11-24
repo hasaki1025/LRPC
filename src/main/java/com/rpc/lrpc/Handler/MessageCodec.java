@@ -33,7 +33,8 @@ public class MessageCodec extends MessageToMessageCodec<ByteBuf,DefaultMessage> 
         MessageUtil.messageToByteBuf(msg,buffer);
         if (msg.getMessageType().equals(MessageType.request)
                 && !msg.getCommandType().equals(CommandType.DokiDoki)
-                && !msg.getCommandType().equals(CommandType.Call))
+                && !msg.getCommandType().equals(CommandType.Call)
+                && !msg.getCommandType().equals(CommandType.Pull))
         {
             //需要等待的响应
             //心跳发送不需要响应

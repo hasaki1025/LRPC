@@ -5,6 +5,7 @@ import com.rpc.lrpc.Enums.CommandType;
 import com.rpc.lrpc.Enums.MessageType;
 import com.rpc.lrpc.message.Content.Request.PushServicesRequest;
 import com.rpc.lrpc.message.Content.Response.SimpleResponse;
+import com.rpc.lrpc.message.Message;
 import com.rpc.lrpc.message.RequestMessage;
 import com.rpc.lrpc.message.ResponseMessage;
 import io.netty.channel.ChannelHandler;
@@ -25,6 +26,10 @@ public class PushServicesRequestHandler extends SimpleChannelInboundHandler<Requ
 
     @Autowired
     RpcConsumer rpcConsumer;
+    @Override
+    public boolean acceptInboundMessage(Object msg) throws Exception {
+        return super.acceptInboundMessage(msg) && ((Message) msg).getCommandType().equals(CommandType.Push);
+    }
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, RequestMessage<PushServicesRequest> msg) throws Exception {
         SimpleResponse response = new SimpleResponse();

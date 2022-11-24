@@ -30,15 +30,36 @@ public class MessageUtil {
     public static  CommandType DEFAULT_COMMANDTYPE;
     public static MessageType messageType;
 
+    public static final String SEQ_COUNTER_NAME ="SeqCounter";
+
     /**
      * 字符串反序列化并转换为RequestMessage
      * @param msg 内容为字符串类型的Message,
      * @return 内容为字符串序列化后的Message
      * @throws JsonProcessingException
      */
-    public static RequestMessage<RequestContent> DefaultMessageToRequest(DefaultMessage msg) throws JsonProcessingException {
+    public static RequestMessage<RequestContent> defaultMessageToRequest(DefaultMessage msg) throws JsonProcessingException {
 
-        Object content = new ObjectMapper().readValue(msg.content(), CommandType.requestTypeClass[msg.getCommandType().getValue()]);
+       RequestContent content=null;
+        if (msg.getCommandType().equals(CommandType.Call)) {
+            content = (DefaultCallServicesRequest)
+                    new ObjectMapper().readValue(msg.content(), CommandType.requestTypeClass[msg.getCommandType().getValue()]);
+        }else if (msg.getCommandType().equals(CommandType.Register)){
+            content = (DefaultRegisterRequest)
+                    new ObjectMapper().readValue(msg.content(), CommandType.requestTypeClass[msg.getCommandType().getValue()]);
+        }else if (msg.getCommandType().equals(CommandType.DokiDoki)){
+            content = (DokiDokiRequest)
+                    new ObjectMapper().readValue(msg.content(), CommandType.requestTypeClass[msg.getCommandType().getValue()]);
+        }else if (msg.getCommandType().equals(CommandType.Pull)){
+            content = (DefaultPullServicesRequest)
+                    new ObjectMapper().readValue(msg.content(), CommandType.requestTypeClass[msg.getCommandType().getValue()]);
+        }else if (msg.getCommandType().equals(CommandType.Push)){
+            content = (DefaultPushServicesRequest)
+                    new ObjectMapper().readValue(msg.content(), CommandType.requestTypeClass[msg.getCommandType().getValue()]);
+        }else if (msg.getCommandType().equals(CommandType.Delete)){
+            content = (DefaultDeleteServiceRequest)
+                    new ObjectMapper().readValue(msg.content(), CommandType.requestTypeClass[msg.getCommandType().getValue()]);
+        }
         return new RequestMessage<>(
                 msg.getMagicNumber(),
                 msg.getVersion(),
@@ -47,7 +68,7 @@ public class MessageUtil {
                 msg.getSize(),
                 msg.getSeq(),
                 msg.getMessageType(),
-                (RequestContent) content
+                content
         );
     }
 
@@ -173,7 +194,7 @@ public class MessageUtil {
 
 
     /**
-     * 解析Url地址为RpcURL实体类,URL格式为rpc://ip:端口/服务名称/mapping
+     * 解析Url地址为RpcURL实体类,URL格式为rpc://服务名称:mapping,但是此时返回的RpcURL实体类并没有设置host和port
      * @param url String类型请求url
      * @return URL实体类
      */
@@ -189,22 +210,9 @@ public class MessageUtil {
        {
            throw new RuntimeException("Not correct URL");
        }
-       String host=split[0];
-       int i = split[1].indexOf("/");
-       assert i!=-1;
-       int port = Integer.parseInt(split[1].substring(0, i));
-       String serviceNameAndMapping = split[1].substring(i + 1);
-       int i1 = serviceNameAndMapping.indexOf("/");
-       String mapping="";
-       String serviceName;
-       if (i1!=-1) {
-           mapping=serviceNameAndMapping.substring(i1);
-           serviceName=serviceNameAndMapping.substring(0,i1);
-       }
-       else {
-           serviceName=serviceNameAndMapping;
-       }
-       return new RpcUrl(new RpcAddress(host, port,serviceName), mapping);
+       String serviceName=split[0];
+       String mapping=split[1];
+       return new RpcUrl(new RpcAddress(serviceName), mapping);
    }
 
     /**

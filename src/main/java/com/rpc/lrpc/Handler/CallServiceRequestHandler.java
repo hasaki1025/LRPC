@@ -8,6 +8,7 @@ import com.rpc.lrpc.Enums.SerializableType;
 import com.rpc.lrpc.message.Content.Request.CallServicesRequest;
 import com.rpc.lrpc.message.Content.Response.CallServicesResponse;
 import com.rpc.lrpc.message.Content.Response.DefaultCallServicesResponse;
+import com.rpc.lrpc.message.Message;
 import com.rpc.lrpc.message.RequestMessage;
 import com.rpc.lrpc.message.ResponseMessage;
 import com.rpc.lrpc.message.RpcMapping;
@@ -37,6 +38,10 @@ public class CallServiceRequestHandler extends SimpleChannelInboundHandler<Reque
     RPCServiceProvider provider;
 
 
+    @Override
+    public boolean acceptInboundMessage(Object msg) throws Exception {
+        return super.acceptInboundMessage(msg) && ((Message) msg).getCommandType().equals(CommandType.Call);
+    }
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, RequestMessage<CallServicesRequest> msg) {

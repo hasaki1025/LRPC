@@ -5,6 +5,8 @@ import com.rpc.lrpc.Enums.MessageType;
 import com.rpc.lrpc.Enums.RpcRole;
 import com.rpc.lrpc.Enums.SerializableType;
 import com.rpc.lrpc.message.Content.Request.RequestContent;
+import lombok.Data;
+
 
 public class RequestMessage<T extends RequestContent> extends AbstractMessage{
 

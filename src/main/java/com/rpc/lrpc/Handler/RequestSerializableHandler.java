@@ -1,24 +1,17 @@
 package com.rpc.lrpc.Handler;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.rpc.lrpc.Enums.CommandType;
 import com.rpc.lrpc.Enums.MessageType;
-import com.rpc.lrpc.Enums.SerializableType;
 import com.rpc.lrpc.Util.MessageUtil;
 import com.rpc.lrpc.message.Content.Request.RequestContent;
 import com.rpc.lrpc.message.DefaultMessage;
 import com.rpc.lrpc.message.RequestMessage;
-import com.rpc.lrpc.net.ResponseMap;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageCodec;
 import io.netty.util.AttributeKey;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -32,9 +25,9 @@ public class RequestSerializableHandler extends MessageToMessageCodec<DefaultMes
     @Override
     protected void encode(ChannelHandlerContext ctx, RequestMessage<RequestContent> msg, List<Object> out) throws Exception {
         //设置SEQ
-        if (!msg.getCommandType().equals(CommandType.Call))
+        if (msg.getSeq()==0)
         {
-            AtomicInteger seqCounter = (AtomicInteger) ctx.channel().attr(AttributeKey.valueOf("seqCounter")).get();
+            AtomicInteger seqCounter = (AtomicInteger) ctx.channel().attr(AttributeKey.valueOf(MessageUtil.SEQ_COUNTER_NAME)).get();
             msg.setSeq(seqCounter.getAndIncrement());
         }
         out.add(MessageUtil.requestToDefaultMessage(msg));
@@ -51,7 +44,7 @@ public class RequestSerializableHandler extends MessageToMessageCodec<DefaultMes
                 return;
             }
             //注意从这之后就只有
-            out.add(MessageUtil.DefaultMessageToRequest(msg));
+            out.add(MessageUtil.defaultMessageToRequest(msg));
         }
         else {
             out.add(msg);

@@ -5,6 +5,7 @@ import com.rpc.lrpc.Enums.CommandType;
 import com.rpc.lrpc.Enums.MessageType;
 import com.rpc.lrpc.message.Content.Request.DeleteServiceRequest;
 import com.rpc.lrpc.message.Content.Response.SimpleResponse;
+import com.rpc.lrpc.message.Message;
 import com.rpc.lrpc.message.RequestMessage;
 import com.rpc.lrpc.message.ResponseMessage;
 import com.rpc.lrpc.message.RpcAddress;
@@ -26,6 +27,10 @@ public class DeleteServiceRquestHandler extends SimpleChannelInboundHandler<Requ
 
     @Autowired
     RpcConsumer rpcConsumer;
+    @Override
+    public boolean acceptInboundMessage(Object msg) throws Exception {
+        return super.acceptInboundMessage(msg) && ((Message) msg).getCommandType().equals(CommandType.Delete);
+    }
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, RequestMessage<DeleteServiceRequest> msg) throws Exception {
         SimpleResponse response = new SimpleResponse();

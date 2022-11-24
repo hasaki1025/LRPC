@@ -1,5 +1,7 @@
 package com.rpc.lrpc.net;
 
+import com.rpc.lrpc.Util.MessageUtil;
+import com.rpc.lrpc.message.Message;
 import io.netty.channel.*;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.logging.LogLevel;
@@ -33,6 +35,6 @@ public class RpcClientChannelInitializer extends ChannelInitializer<Channel> {
         pipeline.addLast(new LoggingHandler(LogLevel.INFO));
         pipeline.addLast(handlersChain.toArray(new ChannelHandler[0]));
         //设置计数器
-        ch.attr(AttributeKey.valueOf("SeqCounter")).set(new AtomicInteger());
+        ch.attr(AttributeKey.valueOf(MessageUtil.SEQ_COUNTER_NAME)).set(new AtomicInteger(1));
     }
 }

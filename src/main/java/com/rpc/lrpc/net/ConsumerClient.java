@@ -4,15 +4,18 @@ import com.rpc.lrpc.Enums.CommandType;
 import com.rpc.lrpc.Enums.MessageType;
 import com.rpc.lrpc.message.Content.Request.*;
 import com.rpc.lrpc.message.Content.Response.CallServicesResponse;
+import com.rpc.lrpc.message.Content.Response.DefaultCallServicesResponse;
 import com.rpc.lrpc.message.Content.Response.ResponseContent;
 import com.rpc.lrpc.message.RequestMessage;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelHandler;
-import io.netty.channel.DefaultEventLoopGroup;
-import io.netty.channel.EventLoopGroup;
+import io.netty.channel.*;
 import io.netty.util.AttributeKey;
+import io.netty.util.concurrent.Future;
+import io.netty.util.concurrent.GenericFutureListener;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
@@ -31,76 +34,30 @@ public class ConsumerClient extends Client {
         }
     }
 
+
     public ConsumerClient(EventLoopGroup group, DefaultEventLoopGroup workerGroup, List<ChannelHandler> handlers, ResponseMap responseMap) {
         super(group, workerGroup, handlers, responseMap);
     }
 
 
-    public void pull()
-    {
+    public void pull() throws ExecutionException, InterruptedException {
         DefaultPullServicesRequest request = new DefaultPullServicesRequest();
-        channel.writeAndFlush(new RequestMessage<PullServicesRequest>(CommandType.Pull, MessageType.request, request));
-    }
-    //废弃的Update方法
-    /*
-    public RpcAddress update(String rpcServiceName)
-    {
-        Future<?> submit = workerGroup.submit(() -> updateSync(rpcServiceName));
-        submit.addListener(future -> {
-            if (future.isSuccess())
-            {
-                RpcAddress address = (RpcAddress) future.get();
-                //TODO 返回或者调用Call
-            }
-        });
+        request.setObject(new Object());
+        RequestMessage<PullServicesRequest> message = new RequestMessage<>(CommandType.Pull, MessageType.request, request);
+        sendMessage(message).get();
     }
 
-    public RpcAddress updateSync(String rpcServiceName)
-    {
-        DefaultUpdateServiceRequest request = new DefaultUpdateServiceRequest();
-        request.setServiceName(rpcServiceName);
-        RequestMessage<UpdateServiceRequest> message =
-                new RequestMessage<>(CommandType.Update, MessageType.request, request);
-        UpdateServiceResponse content = (UpdateServiceResponse) sendMessageSync(message);
-        if (!content.hasException()) {
-            RpcAddress[] addresses = content.getRpcAddresses();
-            if (addresses.length>0) {
-                return addresses[0];
-            }
-        }
-        return null;
-    }
-*/
 
-    private ResponseContent sendMessageSync(RequestMessage<? extends RequestContent> message) {
-        AtomicInteger seqCounter = (AtomicInteger) channel.attr(AttributeKey.valueOf("seqCounter")).get();
-        //在这里已经设置了SEQ，之后无需再次设置
-        int seq = seqCounter.getAndIncrement();
-        message.setSeq(seq);
-        ResponseMap.WAITING_MAP.put(seq, new Object());
-        channel.writeAndFlush(message);
-        synchronized (ResponseMap.WAITING_MAP.get(seq)) {
-            try {
-                ResponseMap.WAITING_MAP.get(seq).wait(responseMap.getRequestTimeOut());
-            } catch (InterruptedException e) {
-                responseMap.removeWaitingRequest(seq);
-                throw new RuntimeException(e);
-            }
-        }
-        return responseMap.getResponse(seq);
-    }
 
-    public Object callSync(Object[] params, String mapping) {
+
+    public Optional<Object> callSync(Object[] params, String mapping) throws ExecutionException, InterruptedException {
         DefaultCallServicesRequest request = new DefaultCallServicesRequest();
         request.setParamValues(params);
         request.setMapping(mapping);
         RequestMessage<CallServicesRequest> message =
                 new RequestMessage<>(CommandType.Call, MessageType.request, request);
-        CallServicesResponse content = (CallServicesResponse) sendMessageSync(message);
-        if (!content.hasException()) {
-            return content.getResult();
-        }
-        return null;
+        CallServicesResponse content = (CallServicesResponse) sendMessage(message).get();
+        return content.hasException() ? Optional.empty(): Optional.of(content.getResult());
     }
 
     public<T> void call(Object[] params, String mapping, Consumer<T> consumer)
@@ -109,26 +66,9 @@ public class ConsumerClient extends Client {
         request.setParamValues(params);
         request.setMapping(mapping);
         RequestMessage<CallServicesRequest> message = new RequestMessage<>(CommandType.Call, MessageType.request, request);
-        AtomicInteger seqCounter = (AtomicInteger) channel.attr(AttributeKey.valueOf("seqCounter")).get();
-        //在这里已经设置了SEQ，之后无需再次设置
-        int seq = seqCounter.getAndIncrement();
-        message.setSeq(seq);
-        ResponseMap.WAITING_MAP.put(seq, new Object());
-        channel.writeAndFlush(message);
-        workerGroup.submit(()->{
-            synchronized (ResponseMap.WAITING_MAP.get(seq)) {
-                try {
-                    ResponseMap.WAITING_MAP.get(seq).wait(responseMap.getRequestTimeOut());
-                } catch (InterruptedException e) {
-                    responseMap.removeWaitingRequest(seq);
-                    throw new RuntimeException(e);
-                }
-                CallServicesResponse response = (CallServicesResponse) responseMap.getResponse(seq);
-                if (!response.hasException())
-                {
-                    consumer.accept((T)response.getResult());
-                }
-            }
+        sendMessage(message).addListener(future -> {
+            DefaultCallServicesResponse content = (DefaultCallServicesResponse) future.get();
+            consumer.accept((T) content.getResult());
         });
     }
 }

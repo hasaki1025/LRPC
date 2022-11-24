@@ -11,7 +11,7 @@ logging:
     io:
       netty:
         handler:
-          logging: debug
+          logging: info
   charset:
     # 输出控制台编码
     console: UTF-8

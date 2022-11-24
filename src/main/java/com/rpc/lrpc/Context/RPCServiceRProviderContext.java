@@ -109,6 +109,14 @@ public class RPCServiceRProviderContext implements RPCServiceProvider{
 
     @Override
     public RpcAddress getRpcUrl() {
+        if (rpcAddress==null)
+        {
+            try {
+                rpcAddress =new RpcAddress(InetAddress.getLocalHost().getHostAddress(),port,serviceName);
+            } catch (UnknownHostException e) {
+                throw new RuntimeException(e);
+            }
+        }
         return rpcAddress;
     }
 

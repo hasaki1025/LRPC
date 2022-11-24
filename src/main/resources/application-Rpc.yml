@@ -6,6 +6,7 @@ RPC:
     HeartGap: 30 #发送心跳的间隔
     RequestTimeOut: 10000
     ChannelType: NIO
+    LoadBalancePolicy: com.rpc.lrpc.LoadBalance.RoundRobin
   Provider:
     port: 8080
     ServiceName: nihao

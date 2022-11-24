@@ -14,4 +14,7 @@ public class RpcUrl {
         this.address = address;
         this.mapping = mapping;
     }
+
+
+
 }
