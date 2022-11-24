@@ -8,6 +8,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.stream.Collectors;
 @Data
 @ConditionalOnProperty(name = {
@@ -21,8 +23,8 @@ public class RpcConsumerContext implements RpcConsumer {
     @Value("${RPC.Server.port}")
      Integer registerServerPort;
 
-     final Map<String,RpcService> serviceMap=new HashMap<>();
-     final Set<RpcURL> urls=new HashSet<>();
+     final Map<String,RpcService> serviceMap=new ConcurrentHashMap<>();
+     final Set<RpcURL> urls=new CopyOnWriteArraySet<>();
     @Override
     //消费服务
     public Object comsumer(String serviceName, String mapping, Object[] params) {

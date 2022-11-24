@@ -11,4 +11,11 @@ public interface RpcRegister {
 
     void registerService(RpcService service,RpcURL rpcURL);
 
+    RpcService getService(String serviceName);
+
+    RpcURL[] getRpcUrls(RpcService rpcService);
+
+    RpcURL[] getRpcUrlsByName(String serviceName);
+
+
 }

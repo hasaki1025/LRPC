@@ -12,6 +12,8 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.function.Function;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
@@ -32,12 +34,12 @@ public class RPCServiceRProviderContext implements RPCServiceProvider{
     @Autowired
     ConfigurableApplicationContext applicationContext;
 
-    final HashSet<RpcMapping> mappings=new HashSet<>();
+    final Set<RpcMapping> mappings=new CopyOnWriteArraySet<>();
 
-    final Map<String,RpcMapping> mappingMap=new HashMap<>();
+    final Map<String,RpcMapping> mappingMap=new ConcurrentHashMap<>();
     private RpcService rpcService;
 
-    private final HashSet<RpcController> rpcControllers=new HashSet<>();
+    private final Set<RpcController> rpcControllers=new CopyOnWriteArraySet<>();
 
     @Override
     public RpcService getRpcService()

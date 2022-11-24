@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rpc.lrpc.Context.RPCServiceProvider;
 import com.rpc.lrpc.Context.RpcRegister;
 import com.rpc.lrpc.Enums.CommandType;
+import com.rpc.lrpc.Enums.MessageType;
 import com.rpc.lrpc.message.Content.Request.RegisterRequest;
 import com.rpc.lrpc.message.Content.Response.SimpleResponse;
 import com.rpc.lrpc.message.RequestMessage;
@@ -37,7 +38,6 @@ public class RegisterRequestHandler extends SimpleChannelInboundHandler<RequestM
             e.printStackTrace();
             response.setException(e);
         }
-        String s = new ObjectMapper().writeValueAsString(response);
-        new ResponseMessage<SimpleResponse>(CommandType.)
+        ctx.writeAndFlush(new ResponseMessage<>(CommandType.Simple, msg.getSeq(), MessageType.response, response));
     }
 }

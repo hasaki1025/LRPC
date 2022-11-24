@@ -6,4 +6,8 @@ public interface ResponseContent extends MessageContent {
 
     boolean hasException();
     Exception getException();
+
+    void setException(Exception e);
+
+
 }

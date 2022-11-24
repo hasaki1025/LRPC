@@ -1,5 +1,8 @@
 package com.rpc.lrpc.message.Content.Response;
 
+import lombok.Data;
+
+@Data
 public class DokiDokiResponse implements ResponseContent {
 
 

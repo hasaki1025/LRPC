@@ -7,27 +7,18 @@ import lombok.Data;
 @Data
 public class DefaultUpdateServiceResponse implements UpdateServiceResponse {
 
-    Exception e;
+    Exception exception;
 
     RpcService rpcService;
-    RpcURL[] rpcURLS;
+    RpcURL[] rpcUrls;
     @Override
     public boolean hasException() {
-        return e!=null;
+        return exception!=null;
     }
 
     @Override
     public Exception getException() {
-        return e;
+        return exception;
     }
 
-    @Override
-    public RpcURL[] getService() {
-        return rpcURLS;
-    }
-
-    @Override
-    public RpcService getServiceName() {
-        return rpcService;
-    }
 }
