@@ -194,6 +194,33 @@ public class MessageUtil {
         return url;
     }
 
+    public static String[] parseAddress(String address)
+    {
+        String[] result = new String[3];
+        if (!address.startsWith("rpc://") || !address.contains(":"))
+        {
+            throw new RuntimeException("Not correct URL");
+        }
+        String s = address.substring(0, 6);
+        String[] split = s.split(":");
+        if (!split[0].contains("."))
+        {
+            throw new RuntimeException("Not correct URL");
+        }
+        result[0]=split[0];
+        String portAndMapping=split[1];
+        if (!portAndMapping.contains("/"))
+        {
+            result[1]=portAndMapping;
+            result[2]="";
+            return result;
+        }
+        int i = portAndMapping.indexOf("/");
+        result[1]=portAndMapping.substring(0,i);
+        result[2] = portAndMapping.substring(i);
+        return result;
+    }
+
 
 
 }

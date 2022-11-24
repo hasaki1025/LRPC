@@ -33,6 +33,7 @@ public class Client implements Closeable {
 
     void init(String host, int port, Class<? extends Channel> channelClass)
     {
+
         try {
             channel = new Bootstrap()
                 .group(group)

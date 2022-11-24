@@ -4,6 +4,7 @@ import com.rpc.lrpc.Enums.CommandType;
 import com.rpc.lrpc.Enums.MessageType;
 import com.rpc.lrpc.message.Content.Request.*;
 import com.rpc.lrpc.message.RequestMessage;
+import io.netty.channel.Channel;
 import io.netty.channel.DefaultEventLoopGroup;
 import io.netty.channel.EventLoopGroup;
 import io.netty.util.AttributeKey;
@@ -13,6 +14,18 @@ import java.util.function.Consumer;
 
 
 public class ConsumerClient extends Client {
+
+
+    private boolean isInit=false;
+
+    @Override
+    void init(String host, int port, Class<? extends Channel> channelClass) {
+        if (!isInit)
+        {
+            isInit=true;
+            super.init(host, port, channelClass);
+        }
+    }
 
     public ConsumerClient(EventLoopGroup group, DefaultEventLoopGroup workerGroup, RpcClientChannelInitializer channelInitializer, ResponseMap responseMap) {
         super(group, workerGroup, channelInitializer, responseMap);

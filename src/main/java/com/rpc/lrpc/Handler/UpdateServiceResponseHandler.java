@@ -34,7 +34,7 @@ public class UpdateServiceResponseHandler extends SimpleChannelInboundHandler<Re
             RpcService rpcService = msg.content().getRpcService();
             HashMap<RpcService, RpcURL[]> map = new HashMap<>();
             map.put(rpcService,urls);
-            rpcConsumer.addService(map);
+            rpcConsumer.addServices(map);
         }
         else {
             msg.content().getException().printStackTrace();

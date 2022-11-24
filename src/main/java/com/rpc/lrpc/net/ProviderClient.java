@@ -20,6 +20,7 @@ import java.util.concurrent.TimeUnit;
 @ConditionalOnBean(RPCServiceProvider.class)
 @Component
 public class ProviderClient extends Client {
+    private boolean isInit=false;
     @Autowired
     public ProviderClient(EventLoopGroup group, DefaultEventLoopGroup workerGroup,  RpcClientChannelInitializer channelInitializer, ResponseMap responseMap) {
         super(group, workerGroup, channelInitializer, responseMap);
@@ -27,15 +28,19 @@ public class ProviderClient extends Client {
     @Autowired
     RPCServiceProvider provider;
 
-    void init() {
-        super.init(provider.getRegisterServerHost(), provider.getRegisterServerPort(), ChannelType.ToChannelClass(provider.getChannelType()));
-        workerGroup.scheduleAtFixedRate(()->{
-            DokiDokiRequest request = new DokiDokiRequest();
-            request.setRpcURL(provider.getRpcUrl());
-            channel.writeAndFlush(new RequestMessage<>(
-                    CommandType.DokiDoki, MessageType.request, request
-            ));
-        },0,provider.getHeartGap(), TimeUnit.SECONDS);
+    public void init() {
+        if (!isInit)
+        {
+            isInit=true;
+            super.init(provider.getRegisterServerHost(), provider.getRegisterServerPort(), ChannelType.ToChannelClass(provider.getChannelType()));
+            workerGroup.scheduleAtFixedRate(()->{
+                DokiDokiRequest request = new DokiDokiRequest();
+                request.setRpcURL(provider.getRpcUrl());
+                channel.writeAndFlush(new RequestMessage<>(
+                        CommandType.DokiDoki, MessageType.request, request
+                ));
+            },0,provider.getHeartGap(), TimeUnit.SECONDS);
+        }
     }
 
     void register()

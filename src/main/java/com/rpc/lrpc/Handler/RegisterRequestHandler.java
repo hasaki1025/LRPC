@@ -1,21 +1,16 @@
 package com.rpc.lrpc.Handler;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.rpc.lrpc.Context.RPCServiceProvider;
 import com.rpc.lrpc.Context.RpcRegister;
 import com.rpc.lrpc.Enums.CommandType;
 import com.rpc.lrpc.Enums.MessageType;
-import com.rpc.lrpc.Enums.RpcRole;
 import com.rpc.lrpc.message.Content.Request.DefaultPushServicesRequest;
-import com.rpc.lrpc.message.Content.Request.PushServicesRequest;
 import com.rpc.lrpc.message.Content.Request.RegisterRequest;
 import com.rpc.lrpc.message.Content.Response.SimpleResponse;
 import com.rpc.lrpc.message.RequestMessage;
 import com.rpc.lrpc.message.ResponseMessage;
 import com.rpc.lrpc.net.DokiDokiMap;
-import com.rpc.lrpc.net.RegsiterServer;
-import com.rpc.lrpc.net.Server;
+import com.rpc.lrpc.net.RegisterServer;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.DefaultEventLoopGroup;
@@ -38,7 +33,7 @@ public class RegisterRequestHandler extends SimpleChannelInboundHandler<RequestM
     RpcRegister rpcRegister;
 
     @Autowired
-    RegsiterServer regsiterServer;
+    RegisterServer registerServer;
 
     @Autowired
     DokiDokiMap dokiDokiMap;
@@ -54,7 +49,7 @@ public class RegisterRequestHandler extends SimpleChannelInboundHandler<RequestM
                 DefaultPushServicesRequest request = new DefaultPushServicesRequest();
                 request.setRpcService(msg.content().getRpcService());
                 request.setRpcURL(msg.content().getRpcURL());
-                regsiterServer.broadcastMessage(request);
+                registerServer.broadcastMessage(request);
             });
         }catch (Exception e)
         {

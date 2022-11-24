@@ -33,6 +33,7 @@ public class ChannelPool {
     EventLoopGroup group;
 
     @Autowired
+    @Qualifier("rpcClientChannelInitializer")
     ChannelInitializer<?> channelInitializer;
     @Autowired
     @Qualifier("workerGroup")
@@ -44,7 +45,7 @@ public class ChannelPool {
     ResponseMap responseMap;
 
     //TODO clientImpl的class需要设置吗
-    public Client getConnection(String address,Class<? extends Client> clientImpl) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+    public<T> T getConnection(String address,Class<T> clientImpl) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         if (connectionPool==null) {
             synchronized (this) {
                 if (connectionPool==null) {
@@ -55,7 +56,7 @@ public class ChannelPool {
 
         Client connection = connectionPool.get(address);
         if (connection!=null) {
-            return connection;
+            return (T) connection;
         }
 
         Object lock = connectionLocks.get(address);
@@ -66,10 +67,10 @@ public class ChannelPool {
         synchronized (lock) {
             Client client = connectionPool.get(address);
             if (client!=null) {
-                return client;
+                return (T) client;
             }
 
-            Client instance = clientImpl
+            Client instance = (Client) clientImpl
                     .getDeclaredConstructor(EventLoopGroup.class, DefaultEventLoopGroup.class, ChannelInitializer.class,RpcConsumer.class,ResponseMap.class)
                     .newInstance(group,defaultEventLoopGroup,channelInitializer,rpcConsumer,responseMap);
             //连接初始化
@@ -77,7 +78,7 @@ public class ChannelPool {
             instance.init(url.getHost(),url.getPort(), ChannelType.ToChannelClass(channelType));
             connectionPool.put(address,instance);
         }
-        return connectionPool.get(address);
+        return (T) connectionPool.get(address);
     }
 
 }

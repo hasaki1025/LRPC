@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class EventLoopFactory {
 
-    @Value("${Rpc.Config.ChannelType}")
+    @Value("${RPC.Config.ChannelType}")
     String type;
     @Bean
     EventLoopGroup group()

@@ -22,7 +22,7 @@ public class RpcConsumerContext implements RpcConsumer {
     @Value("${RPC.Server.Host}")
      String registerServerHost;
     @Value("${RPC.Server.port}")
-     Integer registerServerPort;
+     int registerServerPort;
 
     @Value("${RPC.Config.RequestTimeOut}")
     long requestTimeOut;
