@@ -17,5 +17,7 @@ public interface RpcRegister {
 
     RpcURL[] getRpcUrlsByName(String serviceName);
 
+    RpcURL[] getAllUrl();
+
 
 }

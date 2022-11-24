@@ -33,4 +33,11 @@ public class DokiDokiMap {
         dokodoki.put(url,System.currentTimeMillis());
     }
 
+    public void addAllUrl(RpcURL[] urls)
+    {
+        for (RpcURL url : urls) {
+            dokodoki.put(url,System.currentTimeMillis());
+        }
+    }
+
 }

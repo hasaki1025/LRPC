@@ -23,6 +23,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -87,4 +88,16 @@ public class LRpcApplicationTests {
         channel.writeInbound(buffer);
         System.out.println(responseMap.getResponse(1));
     }
+
+    @Test
+    void testLoaclhost() {
+        try {
+            System.out.println(InetAddress.getLocalHost().getHostAddress());
+        } catch (UnknownHostException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+
 }

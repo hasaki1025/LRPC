@@ -16,7 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
-@ConditionalOnBean(RpcRegister.class)
+//TODO 是否需要添加条件注解
 @Component
 @ChannelHandler.Sharable
 @Slf4j

@@ -19,11 +19,11 @@ public enum CommandType {
     // TODO SimpleResponse需要添加
     public static final Class<?>[] responseTypeClass={
             DefaultCallServicesResponse.class,
-            DefaultRegisterResponse.class,
+            SimpleResponse.class,
             DefaultPullServicesResponse.class,
             UpdateServiceResponse.class,
             DokiDokiResponse.class,
-            DefaultPushServiceResponse.class,
+            SimpleResponse.class,
             SimpleResponse.class
     };
 

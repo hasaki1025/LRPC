@@ -27,7 +27,8 @@ public class RpcRegisterContext implements RpcRegister {
 
      //TODO 心跳功能实现
      @Autowired
-    DokiDokiMap dokiDokiMap;
+     DokiDokiMap dokiDokiMap;
+
 
     @Override
     public void registerService(RpcService service, RpcURL rpcURL) {
@@ -56,5 +57,14 @@ public class RpcRegisterContext implements RpcRegister {
     @Override
     public RpcURL[] getRpcUrlsByName(String serviceName) {
         return rpcServiceMap.get(serviceNameMap.get(serviceName));
+    }
+
+    @Override
+    public RpcURL[] getAllUrl() {
+        ArrayList<RpcURL> urls = new ArrayList<>();
+        for (RpcService value : serviceNameMap.values()) {
+            urls.addAll(List.of(rpcServiceMap.get(value)));
+        }
+        return urls.toArray(new RpcURL[0]);
     }
 }
