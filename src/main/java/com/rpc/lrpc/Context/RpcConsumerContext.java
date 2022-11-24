@@ -31,23 +31,24 @@ public class RpcConsumerContext implements RpcConsumer {
 
      final Set<RpcMapping> mappings=new HashSet<>();
      final Set<RpcURL> urls=new CopyOnWriteArraySet<>();
-    @Override
-    //消费服务
-    public Object comsumer(String serviceName, String mapping, Object[] params) {
-        return null;
-    }
 
     @Override
-    //拉取服务列表
-    public void addService(RpcService service) {
+    public void addService(RpcService service,RpcURL rpcURL) {
         serviceMap.put(service.getServiceName(),service);
-    }
-
-    @Override
-    public void updateServices(RpcService rpcService, RpcURL rpcURL) {
-        serviceMap.put(rpcService.getServiceName(),rpcService);
+        mappings.addAll(Arrays.asList(service.getRpcMappings()));
         urls.add(rpcURL);
     }
+
+    @Override
+    public void addServices(Map<RpcService, RpcURL[]> service) {
+        for (Map.Entry<RpcService, RpcURL[]> entry : service.entrySet()) {
+            for (RpcURL rpcURL : entry.getValue()) {
+                addService(entry.getKey(),rpcURL);
+            }
+        }
+    }
+
+
 
     @Override
     public RpcMapping getRpcMappingByName(String mapping) {

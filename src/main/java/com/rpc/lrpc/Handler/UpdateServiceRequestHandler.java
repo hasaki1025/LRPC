@@ -43,6 +43,6 @@ public class UpdateServiceRequestHandler extends SimpleChannelInboundHandler<Req
             e.printStackTrace();
             response.setException(e);
         }
-        ctx.writeAndFlush(new ResponseMessage<>(CommandType.Update, msg.getSeq(), MessageType.response, response, RpcRole.Register));
+        ctx.writeAndFlush(new ResponseMessage<>(CommandType.Update,MessageType.response,response,msg.getSeq()));
     }
 }

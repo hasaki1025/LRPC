@@ -61,7 +61,7 @@ public class RegisterRequestHandler extends SimpleChannelInboundHandler<RequestM
             e.printStackTrace();
             response.setException(e);
         }
-        ctx.writeAndFlush(new ResponseMessage<>(CommandType.Simple, msg.getSeq(), MessageType.response, response, RpcRole.Register));
+        ctx.writeAndFlush(new ResponseMessage<>(CommandType.Register,MessageType.response,response,msg.getSeq()));
         //TODO 发送广播通知其他Channel
 
     }

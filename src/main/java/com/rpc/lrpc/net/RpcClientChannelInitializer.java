@@ -1,25 +1,23 @@
 package com.rpc.lrpc.net;
 
-import com.rpc.lrpc.Context.RpcConsumer;
-import com.rpc.lrpc.Enums.RpcRole;
 import io.netty.channel.*;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
-import io.netty.handler.codec.string.StringEncoder;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.util.AttributeKey;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
-public class RpcChannelInitializer extends ChannelInitializer<Channel> {
+@Component
+@ConditionalOnProperty({"RPC.Server.Host","RPC.Server.port"})
+public class RpcClientChannelInitializer extends ChannelInitializer<Channel> {
 
 
     @Autowired

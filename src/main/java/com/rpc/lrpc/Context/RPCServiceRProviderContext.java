@@ -1,6 +1,7 @@
 package com.rpc.lrpc.Context;
 
 import com.rpc.lrpc.Annotation.RPCController;
+import com.rpc.lrpc.Enums.ChannelType;
 import com.rpc.lrpc.message.RpcController;
 import com.rpc.lrpc.message.RpcMapping;
 import com.rpc.lrpc.message.RpcService;
@@ -40,11 +41,11 @@ public class RPCServiceRProviderContext implements RPCServiceProvider{
     @Autowired
     ConfigurableApplicationContext applicationContext;
     private RpcURL rpcURL;
+    @Value("${RPC.Config.ChannelType}")
+    String channelType;
 
-
-
-    @Autowired
-    ConfigurableApplicationContext applicationContext;
+    @Value("${RPC.Config.HeartGap}")
+    int heartGap;
 
     final Set<RpcMapping> mappings=new CopyOnWriteArraySet<>();
 

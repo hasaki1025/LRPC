@@ -2,6 +2,8 @@ package com.rpc.lrpc.net;
 
 import com.rpc.lrpc.message.Content.Response.CallServicesResponse;
 import com.rpc.lrpc.message.Content.Response.ResponseContent;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -14,11 +16,16 @@ public class ResponseMap {
     private final Map<Integer, ResponseContent> responseMap=new ConcurrentHashMap<>();
     public static final Map<Integer,Object> WAITING_MAP =new ConcurrentHashMap<>();
 
+    @Value("${RPC.Config.RequestTimeOut}")
+    long requestTimeOut;
+
+
 
     public boolean stillWaiting(int seq)
     {
         return WAITING_MAP.containsKey(seq);
     }
+
 
     public void addWaitingRequest(int seq)
     {
@@ -67,5 +74,7 @@ public class ResponseMap {
     }
 
 
-
+    public long getRequestTimeOut() {
+        return requestTimeOut;
+    }
 }

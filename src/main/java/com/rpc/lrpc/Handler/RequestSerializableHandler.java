@@ -31,9 +31,12 @@ public class RequestSerializableHandler extends MessageToMessageCodec<DefaultMes
 
     @Override
     protected void encode(ChannelHandlerContext ctx, RequestMessage<RequestContent> msg, List<Object> out) throws Exception {
-        AtomicInteger seqCounter = (AtomicInteger) ctx.channel().attr(AttributeKey.valueOf("seqCounter")).get();
         //设置SEQ
-        msg.setSeq(seqCounter.getAndIncrement());
+        if (!msg.getCommandType().equals(CommandType.Call))
+        {
+            AtomicInteger seqCounter = (AtomicInteger) ctx.channel().attr(AttributeKey.valueOf("seqCounter")).get();
+            msg.setSeq(seqCounter.getAndIncrement());
+        }
         out.add(MessageUtil.requestToDefaultMessage(msg));
     }
 

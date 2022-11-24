@@ -1,6 +1,7 @@
 package com.rpc.lrpc.Context;
 
 import com.rpc.lrpc.Annotation.RPCController;
+import com.rpc.lrpc.Enums.ChannelType;
 import com.rpc.lrpc.message.RpcController;
 import com.rpc.lrpc.message.RpcMapping;
 import com.rpc.lrpc.message.RpcService;
@@ -34,4 +35,7 @@ public interface RPCServiceProvider {
 
     Object invokeMapping(Object[] params,String mapping) throws InvocationTargetException, IllegalAccessException;
 
+
+    String getChannelType();
+    int getHeartGap();
 }

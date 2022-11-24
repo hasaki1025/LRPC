@@ -30,12 +30,12 @@ public class PushServicesRequestHandler extends SimpleChannelInboundHandler<Requ
     protected void channelRead0(ChannelHandlerContext ctx, RequestMessage<PushServicesRequest> msg) throws Exception {
         SimpleResponse response = new SimpleResponse();
         try{
-            rpcConsumer.addService(msg.content().getRpcService());
+            rpcConsumer.addService(msg.content().getRpcService(),msg.content().getRpcURL());
         }catch (Exception e)
         {
             e.printStackTrace();
             response.setException(e);
         }
-        ctx.writeAndFlush(new ResponseMessage<>(CommandType.Simple, msg.getSeq(), MessageType.response, response, RpcRole.Consumer));
+        ctx.writeAndFlush(new ResponseMessage<>(CommandType.Push,MessageType.response,response,msg.getSeq()));
     }
 }

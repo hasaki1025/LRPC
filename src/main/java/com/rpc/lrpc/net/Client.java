@@ -19,12 +19,12 @@ public class Client implements Closeable {
 
     final DefaultEventLoopGroup workerGroup;
     Channel channel;
-    final RpcChannelInitializer channelInitializer;
+    final RpcClientChannelInitializer channelInitializer;
 
 
-    private final ResponseMap responseMap;
+     final ResponseMap responseMap;
 
-    public Client(EventLoopGroup group, DefaultEventLoopGroup workerGroup, RpcChannelInitializer channelInitializer, ResponseMap responseMap) {
+    public Client(EventLoopGroup group, DefaultEventLoopGroup workerGroup, RpcClientChannelInitializer channelInitializer, ResponseMap responseMap) {
         this.group = group;
         this.workerGroup = workerGroup;
         this.channelInitializer = channelInitializer;

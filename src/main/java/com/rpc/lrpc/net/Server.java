@@ -36,12 +36,10 @@ public class Server implements Closeable {
     @Qualifier("workerGroup")
     DefaultEventLoopGroup workerGroup;
     ServerChannel serverChannel;
-    @Autowired
-    List<ChannelHandler> handlersChain;
 
-    //用于保存所有连接
-    private final static ChannelGroup CHANNEL_GROUP =new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
+
     private final static ChannelGroup CHANNEL_CONSUMER_GROUP =new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
+
 
     public  boolean containConsumerChannnel(Channel channel)
     {
@@ -59,32 +57,15 @@ public class Server implements Closeable {
     }
 
 
-    void init(int port)
+    void init(int port,RpcServerChannelInitializer channelInitializer)
     {
         try {
 
             new ServerBootstrap()
                     .group(bossGroup,chirdGroup)
                     .channel(NioServerSocketChannel.class)
-                    .childHandler(new ChannelInitializer<NioSocketChannel>() {
-
-                        @Override
-                        public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
-                            CHANNEL_GROUP.add(ctx.channel());
-                        }
-                        @Override
-                        public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
-                            CHANNEL_GROUP.remove(ctx.channel());
-                        }
-                        @Override
-                        protected void initChannel(NioSocketChannel ch) throws Exception {
-                            ChannelPipeline pipeline = ch.pipeline();
-                            pipeline.addLast(
-                                    new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE,12,4,0,0));
-                            pipeline.addLast(new LoggingHandler(LogLevel.INFO));
-                            pipeline.addLast(handlersChain.toArray(new ChannelHandler[0]));
-                        }
-                    }).bind(port).addListener((ChannelFutureListener) future -> {
+                    .childHandler(channelInitializer)
+                    .bind(port).addListener((ChannelFutureListener) future -> {
                         if(future.channel() instanceof NioServerSocketChannel)
                         {
                             serverChannel= (NioServerSocketChannel) future.channel();
