@@ -1,17 +1,23 @@
 package com.rpc.lrpc.net;
 
+import com.rpc.lrpc.Context.RpcConsumer;
 import com.rpc.lrpc.Enums.ChannelType;
+import com.rpc.lrpc.Util.MessageUtil;
+import com.rpc.lrpc.message.RpcURL;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.DefaultEventLoopGroup;
 import io.netty.channel.EventLoopGroup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.ConcurrentHashMap;
-@Configuration
+@Component
+@ConditionalOnBean(RpcConsumer.class)
 public class ChannelPool {
 
     //连接池，key为连接地址，value是连接
@@ -33,7 +39,12 @@ public class ChannelPool {
     @Qualifier("workerGroup")
     DefaultEventLoopGroup defaultEventLoopGroup;
 
-    public  Client getConnection(String address,Class<? extends Client> clientImpl) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+    @Autowired
+    RpcConsumer rpcConsumer;
+    @Autowired
+    ResponseMap responseMap;
+
+    public Client getConnection(String address,Class<? extends ConsumerClient> clientImpl) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         if (connectionPool==null) {
             synchronized (this) {
                 if (connectionPool==null) {
@@ -59,11 +70,11 @@ public class ChannelPool {
             }
 
             Client instance = clientImpl
-                    .getDeclaredConstructor(EventLoopGroup.class, DefaultEventLoopGroup.class, ChannelInitializer.class)
-                    .newInstance(group,defaultEventLoopGroup,channelInitializer);
+                    .getDeclaredConstructor(EventLoopGroup.class, DefaultEventLoopGroup.class, ChannelInitializer.class,RpcConsumer.class,ResponseMap.class)
+                    .newInstance(group,defaultEventLoopGroup,channelInitializer,rpcConsumer,responseMap);
             //连接初始化
-            String[] split = address.split(":");
-            instance.init(split[0],Integer.parseInt(split[1]), ChannelType.ToChannelClass(channelType));
+            RpcURL url = MessageUtil.getUrlByString(address);
+            instance.init(url.getHost(),url.getPort(), ChannelType.ToChannelClass(channelType));
             connectionPool.put(address,instance);
         }
         return connectionPool.get(address);

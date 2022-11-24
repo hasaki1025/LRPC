@@ -30,6 +30,5 @@ public class SimpleResonseHandler extends SimpleChannelInboundHandler<ResponseMe
         if (msg.content().hasException()) {
             msg.content().getException().printStackTrace();
         }
-        responseMap.removeWaitingRequest(msg.getSeq());
     }
 }

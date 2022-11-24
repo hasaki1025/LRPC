@@ -29,7 +29,6 @@ public class CallServiceResponseHandler extends SimpleChannelInboundHandler<Resp
         log.info("[{}] Request get Response",msg.getSeq());
         if (msg.content().hasException()) {
             msg.content().getException().printStackTrace();
-            responseMap.removeWaitingRequest(msg.getSeq());
         }else {
             responseMap.putResponse(msg.getSeq(),msg.content());
         }

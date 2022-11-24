@@ -1,5 +1,6 @@
 package com.rpc.lrpc.Context;
 
+import com.rpc.lrpc.message.RpcMapping;
 import com.rpc.lrpc.message.RpcService;
 import com.rpc.lrpc.message.RpcURL;
 import lombok.Data;
@@ -26,8 +27,13 @@ public class RpcConsumerContext implements RpcConsumer {
     @Value("${RPC.Server.port}")
      Integer registerServerPort;
 
+    @Value("${RPC.Config.RequestTimeOut}")
+    long requestTimeOut;
+
 
      final Map<String,RpcService> serviceMap=new ConcurrentHashMap<>();
+
+     final Set<RpcMapping> mappings=new HashSet<>();
      final Set<RpcURL> urls=new CopyOnWriteArraySet<>();
     @Override
     //消费服务
@@ -41,14 +47,21 @@ public class RpcConsumerContext implements RpcConsumer {
         Set<RpcService> serviceSet = map.keySet();
         for (RpcService service : serviceSet) {
             serviceMap.put(service.getServiceName(),service);
+            mappings.addAll(List.of(service.getRpcMappings()));
             urls.addAll(List.of(map.get(service)));
         }
     }
 
     @Override
-    public void UpdateServices(RpcService rpcService, RpcURL rpcURL) {
+    public void updateServices(RpcService rpcService, RpcURL rpcURL) {
         serviceMap.put(rpcService.getServiceName(),rpcService);
         urls.add(rpcURL);
+    }
+
+    @Override
+    public RpcMapping getRpcMappingByName(String mapping) {
+        Optional<RpcMapping> first = mappings.stream().filter(x -> x.getMapping().equals(mapping)).findFirst();
+        return first.orElse(null);
     }
 
 
