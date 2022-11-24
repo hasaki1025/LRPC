@@ -12,8 +12,7 @@ public class DeleteContent implements BroadMassageContent {
         this.address = address;
     }
 
-
-    public RpcAddress getAddress() {
-        return null;
+    public DeleteContent() {
     }
+
 }

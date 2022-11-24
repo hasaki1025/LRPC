@@ -24,7 +24,12 @@ import java.util.stream.Collectors;
 
 
 @Data
-@ConditionalOnProperty(name={"RPC.Provider.ServiceName","RPC.Provider.port","RPC.Server.Host","RPC.Server.port"})
+@ConditionalOnProperty(name={
+        "RPC.Provider.ServiceName",
+        "RPC.Provider.port",
+        "RPC.Server.Host",
+        "RPC.Server.port"}
+)
 @Component
 public class RPCServiceRProviderContext implements RPCServiceProvider{
     @Value("${RPC.Provider.ServiceName}")

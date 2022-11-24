@@ -10,9 +10,9 @@ public enum CommandType {
     Call(0),Register(1),Pull(2),DokiDoki(3),Push(4),Delete(5),Simple(6);
 
     public static final Class<?>[] requestTypeClass={
-            DefaultCallServicesRequest.class,
-            DefaultRegisterRequest.class,
-            DefaultPullServicesRequest.class,
+            CallServicesRequest.class,
+            RegisterRequest.class,
+            PullServicesRequest.class,
             DokiDokiRequest.class,
             PushContent.class,
             DeleteContent.class,
@@ -20,9 +20,9 @@ public enum CommandType {
 
 
     public static final Class<?>[] responseTypeClass={
-            DefaultCallServicesResponse.class,
+            CallServicesResponse.class,
             SimpleResponse.class,
-            DefaultPullServicesResponse.class,
+            PullServicesResponse.class,
             DokiDokiResponse.class,
             SimpleResponse.class,
             SimpleResponse.class,

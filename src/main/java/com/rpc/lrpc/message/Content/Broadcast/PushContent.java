@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Data
 public class PushContent implements BroadMassageContent {
-    RpcService rpcService;
+    String[] mappings;
     RpcAddress rpcAddress;
 
 

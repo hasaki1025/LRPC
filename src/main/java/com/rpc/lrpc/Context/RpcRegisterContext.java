@@ -5,8 +5,6 @@ import com.rpc.lrpc.Enums.MessageType;
 import com.rpc.lrpc.message.BroadcastMessage;
 import com.rpc.lrpc.message.Content.Broadcast.DeleteContent;
 import com.rpc.lrpc.message.Content.Broadcast.PushContent;
-import com.rpc.lrpc.message.RequestMessage;
-import com.rpc.lrpc.message.RpcService;
 import com.rpc.lrpc.message.RpcAddress;
 import com.rpc.lrpc.net.DokiDokiMap;
 import com.rpc.lrpc.net.Server;
@@ -18,7 +16,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArraySet;
 
 @Data
 @ConditionalOnProperty(name = {
@@ -26,10 +23,18 @@ import java.util.concurrent.CopyOnWriteArraySet;
 })
 @Component
 public class RpcRegisterContext implements RpcRegister {
-     final Map<RpcService, RpcAddress[]> rpcServiceMap=new ConcurrentHashMap<>();
-     final Map<String,RpcService> serviceNameMap=new ConcurrentHashMap<>();
 
-     final Set<RpcAddress> addressSet=new CopyOnWriteArraySet<>();
+
+    /**
+     * key为服务名称，value为mapping名称
+     */
+     final Map<String,String[]> mappingMap=new ConcurrentHashMap<>();
+    /**
+     * key为服务名称，value为该服务所有地址
+     */
+    final Map<String,RpcAddress[]> addressMap=new ConcurrentHashMap<>();
+
+
 
      @Value("${RPC.Register.port}")
       Integer port;
@@ -40,71 +45,79 @@ public class RpcRegisterContext implements RpcRegister {
 
 
     @Override
-    public void registerService(RpcService service, RpcAddress rpcAddress) {
-        if (rpcServiceMap.containsKey(service))
+    public void registerService(String[] mappings, RpcAddress rpcAddress) {
+        Set<String> serviceSet = addressMap.keySet();
+        String serviceName = rpcAddress.getServiceName();
+        if (serviceSet.contains(serviceName))
         {
-            ArrayList<RpcAddress> urls = new ArrayList<>(List.of(rpcServiceMap.get(service)));
+            ArrayList<RpcAddress> urls = new ArrayList<>(List.of(addressMap.get(serviceName)));
             urls.add(rpcAddress);
-            rpcServiceMap.put(service,urls.toArray(new RpcAddress[0]));
+            mappingMap.put(serviceName,mappings);
+            addressMap.put(serviceName,urls.toArray(new RpcAddress[0]));
         }
         else {
-            rpcServiceMap.put(service,new RpcAddress[]{rpcAddress});
-            serviceNameMap.put(service.getServiceName(),service);
+            addressMap.put(serviceName,new RpcAddress[]{rpcAddress});
+            mappingMap.put(serviceName,mappings);
         }
         dokiDokiMap.addUrl(rpcAddress);
-        addressSet.add(rpcAddress);
         PushContent content = new PushContent();
-        content.setRpcService(service);
+        content.setMappings(mappings);
         content.setRpcAddress(rpcAddress);
         Server.broadcastMessage(new BroadcastMessage<>(CommandType.Push, MessageType.broadcast, content));
     }
 
     @Override
-    public RpcService getService(String serviceName) {
-        return serviceNameMap.get(serviceName);
+    public RpcAddress[] getRpcAddress(String serviceName) {
+        return addressMap.get(serviceName);
     }
 
     @Override
-    public RpcAddress[] getRpcUrls(RpcService rpcService) {
-        return rpcServiceMap.get(rpcService);
-    }
-
-    @Override
-    public RpcAddress[] getRpcUrlsByName(String serviceName) {
-        return rpcServiceMap.get(serviceNameMap.get(serviceName));
-    }
-
-    @Override
-    public RpcAddress[] getAllUrl() {
-        return addressSet.toArray(new RpcAddress[0]);
+    public RpcAddress[] getAllAddress() {
+        HashSet<RpcAddress> set = new HashSet<>();
+        for (RpcAddress[] addresses : addressMap.values()) {
+            set.addAll(List.of(addresses));
+        }
+        return set.toArray(new RpcAddress[0]);
     }
 
     @Override
     public void removeAddress(RpcAddress rpcAddress) {
-        if (!addressSet.remove(rpcAddress)) {
-            throw new RuntimeException("Do not have this rpcaddress");
-        }
+
 
         String serviceName = rpcAddress.getServiceName();
         if (serviceName==null || serviceName.equals(""))
         {
-            throw new RuntimeException("Do not have this rpcaddress");
+            throw new RuntimeException("no ServiceName Can Find or you must set ServiceName");
         }
-        RpcService service = serviceNameMap.get(serviceName);
-        RpcAddress[] addresses = rpcServiceMap.get(service);
+        RpcAddress[] addresses = addressMap.get(serviceName);
+        if (addresses==null)
+        {
+            throw new RuntimeException("No match Address");
+        }
         if (addresses.length==1 && addresses[0].equals(rpcAddress)) {
-            rpcServiceMap.remove(service);
-            serviceNameMap.remove(serviceName);
+            addressMap.remove(serviceName);
+            mappingMap.remove(serviceName);
         }else {
-            List<RpcAddress> list = List.of(addresses);
+            List<RpcAddress> list = new ArrayList<>(List.of(addresses));
             list.remove(rpcAddress);
-            rpcServiceMap.put(service,list.toArray(new RpcAddress[0]));
+            addressMap.put(serviceName,list.toArray(new RpcAddress[0]));
         }
+
+
+
         DeleteContent content = new DeleteContent(rpcAddress);
         Server.broadcastMessage(new BroadcastMessage<>(CommandType.Delete, MessageType.broadcast, content));
     }
 
+    @Override
+    public String[] getMappings(String serviceName) {
+        return mappingMap.get(serviceName);
+    }
 
+    @Override
+    public String[] getAllServiceName() {
+        return mappingMap.keySet().toArray(new String[0]);
+    }
 
 
 }

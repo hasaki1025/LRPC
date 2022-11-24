@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -49,12 +50,17 @@ public class RegisterServer extends Server{
 
     private void enableDokiDokiCheck() {
         workerGroup.scheduleAtFixedRate(()->{
-            for (RpcAddress url : register.getAllUrl()) {
-                if (!dokiDokiMap.checkUrlIsExpire(url)) {
-                    register.removeAddress(url);
-
+            List<RpcAddress> addressNeedRemove = new ArrayList<>();
+            for (RpcAddress address : register.getAllAddress()) {
+                //检查后DokiDokiMap移除该地址
+                if (!dokiDokiMap.checkUrlIsExpire(address)) {
+                    addressNeedRemove.add(address);
                 }
             }
+            for (RpcAddress address : addressNeedRemove) {
+                register.removeAddress(address);
+            }
+
         },0,heartCheckTime, TimeUnit.SECONDS);
     }
 

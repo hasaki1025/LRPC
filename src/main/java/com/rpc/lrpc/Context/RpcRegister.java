@@ -7,20 +7,17 @@ import java.util.Map;
 
 public interface RpcRegister {
 
-    Map<RpcService, RpcAddress[]> getRpcServiceMap();
 
-    void registerService(RpcService service, RpcAddress rpcAddress);
+    void registerService(String[] mappings, RpcAddress rpcAddress);
 
-    RpcService getService(String serviceName);
+    RpcAddress[] getRpcAddress(String serviceName);
 
-    RpcAddress[] getRpcUrls(RpcService rpcService);
-
-    RpcAddress[] getRpcUrlsByName(String serviceName);
-
-    RpcAddress[] getAllUrl();
+    RpcAddress[] getAllAddress();
 
     void removeAddress(RpcAddress rpcAddress);
 
+    String[] getMappings(String serviceName);
+    String[] getAllServiceName();
 
 
 

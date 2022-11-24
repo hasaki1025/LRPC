@@ -4,14 +4,11 @@ import com.rpc.lrpc.Context.RpcConsumer;
 import com.rpc.lrpc.Enums.ChannelType;
 import com.rpc.lrpc.Enums.CommandType;
 import com.rpc.lrpc.Enums.MessageType;
-import com.rpc.lrpc.message.Content.Request.DefaultPullServicesRequest;
 import com.rpc.lrpc.message.Content.Request.PullServicesRequest;
-import com.rpc.lrpc.message.Content.Response.ResponseContent;
 import com.rpc.lrpc.message.RequestMessage;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.DefaultEventLoopGroup;
 import io.netty.channel.EventLoopGroup;
-import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.logging.LoggingHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +16,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -50,7 +46,7 @@ public class ConsumerToRegisterClient extends Client{
 
 
     public void pull() throws ExecutionException, InterruptedException {
-        DefaultPullServicesRequest request = new DefaultPullServicesRequest();
+        PullServicesRequest request = new PullServicesRequest();
         RequestMessage<PullServicesRequest> message = new RequestMessage<>(CommandType.Pull, MessageType.request, request);
         sendMessage(message).get();
     }

@@ -9,10 +9,14 @@ import java.util.Map;
 
 public interface RpcConsumer {
 
-    void addService(RpcService service, RpcAddress rpcAddress) throws Exception;
-    void addServices(Map<RpcService, RpcAddress[]> service) throws Exception;
+
     String getRegisterServerHost();
     int getRegisterServerPort();
+
+    void addService(RpcAddress rpcAddress, String[] mappings) throws Exception;
+
+    void addServices(Map<String, RpcAddress[]> addressMap, Map<String, String[]> mappingMap) throws Exception;
+
     RpcAddress[] getAllAddress();
 
     public long getRequestTimeOut();

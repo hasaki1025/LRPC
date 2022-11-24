@@ -7,7 +7,6 @@ import com.rpc.lrpc.Enums.MessageType;
 import com.rpc.lrpc.message.*;
 import com.rpc.lrpc.message.Content.Request.RegisterRequest;
 import com.rpc.lrpc.message.Content.Response.SimpleResponse;
-import com.rpc.lrpc.net.Server;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.DefaultEventLoopGroup;
@@ -16,7 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.context.annotation.Scope;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -42,9 +40,10 @@ public class RegisterRequestHandler extends SimpleChannelInboundHandler<RequestM
     protected void channelRead0(ChannelHandlerContext ctx, RequestMessage<RegisterRequest> msg) throws JsonProcessingException {
         SimpleResponse response = new SimpleResponse();
         try {
-            RpcService service = msg.content().getRpcService();
-            RpcAddress rpcAddress = msg.content().getRpcAddress();
-            rpcRegister.registerService(service, rpcAddress);
+            RpcAddress address = msg.content().getRpcAddress();
+            String[] mappings = msg.content().getMappings();
+            rpcRegister.registerService(mappings, address);
+            log.info("get Register Request[{}]",address.toString());
         }catch (Exception e)
         {
             e.printStackTrace();

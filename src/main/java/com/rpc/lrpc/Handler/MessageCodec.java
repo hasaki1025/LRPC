@@ -40,7 +40,6 @@ public class MessageCodec extends MessageToMessageCodec<ByteBuf,DefaultMessage> 
             //心跳发送不需要响应
             Attribute<Object> attr = ctx.channel().attr(AttributeKey.valueOf(MessageUtil.CHANNEL_RESPONSE_MAP));
             ChannelResponse channelResponse = (ChannelResponse) attr.get();
-            log.info("channelResponseMap : {}",channelResponse);
             channelResponse.addWaitRequest(msg.getSeq());
         }
         out.add(buffer);

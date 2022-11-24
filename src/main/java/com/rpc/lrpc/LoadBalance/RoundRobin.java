@@ -10,12 +10,12 @@ public class RoundRobin implements LoadBalancePolicy{
     private final AtomicInteger atomicInteger=new AtomicInteger();
     @Override
     public<T> T getNext(List<T> data) {
-        return data.get(atomicInteger.getAndIncrement());
+        return data.get(atomicInteger.getAndIncrement()%data.size());
     }
 
     @Override
     public <T> T getNext(T[] data) {
-        return data[atomicInteger.getAndIncrement()];
+        return data[atomicInteger.getAndIncrement()%data.length];
     }
 
 }

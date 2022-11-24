@@ -3,10 +3,8 @@ package com.rpc.lrpc.Handler;
 import com.rpc.lrpc.Context.RpcRegister;
 import com.rpc.lrpc.Enums.CommandType;
 import com.rpc.lrpc.Enums.MessageType;
-import com.rpc.lrpc.Enums.RpcRole;
 import com.rpc.lrpc.message.*;
 import com.rpc.lrpc.message.Content.Request.PullServicesRequest;
-import com.rpc.lrpc.message.Content.Response.DefaultPullServicesResponse;
 import com.rpc.lrpc.message.Content.Response.PullServicesResponse;
 import com.rpc.lrpc.net.Server;
 import io.netty.channel.ChannelHandler;
@@ -15,11 +13,10 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.context.annotation.Scope;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.Map;
 
 @ConditionalOnBean(RpcRegister.class)
@@ -39,15 +36,22 @@ public class PullServicesRequestHandler extends SimpleChannelInboundHandler<Requ
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, RequestMessage<PullServicesRequest> msg) throws Exception {
-        PullServicesResponse response = new DefaultPullServicesResponse();
+        PullServicesResponse response = new PullServicesResponse();
         try
         {
             //添加ConsumerChannel
             if (!Server.containConsumerChannnel(ctx.channel())) {
                 Server.addConsumerChannel(ctx.channel());
             }
-            Map<RpcService, RpcAddress[]> serviceMap = rpcRegister.getRpcServiceMap();
-            response.addRpcService(serviceMap);
+            HashMap<String, RpcAddress[]> addressMap = new HashMap<>();
+            HashMap<String, String[]> mappingMap = new HashMap<>();
+            for (String serviceName : rpcRegister.getAllServiceName()) {
+                RpcAddress[] address = rpcRegister.getRpcAddress(serviceName);
+                addressMap.put(serviceName,address);
+                mappingMap.put(serviceName,rpcRegister.getMappings(serviceName));
+            }
+            response.setAddressMap(addressMap);
+            response.setMappingMap(mappingMap);
         }
         catch (Exception e)
         {

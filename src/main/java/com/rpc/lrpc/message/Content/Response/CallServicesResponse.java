@@ -1,7 +1,21 @@
 package com.rpc.lrpc.message.Content.Response;
 
-public interface CallServicesResponse extends ResponseContent{
+import lombok.Data;
 
+@Data
+public class CallServicesResponse implements ResponseContent{
 
-    Object getResult();
+    Exception exception;
+
+    Object result;
+
+   @Override
+    public boolean hasException() {
+        return exception!=null;
+    }
+
+    @Override
+    public Exception getException() {
+        return exception;
+    }
 }

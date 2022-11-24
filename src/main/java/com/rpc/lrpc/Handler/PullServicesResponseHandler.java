@@ -17,7 +17,6 @@ import io.netty.util.AttributeKey;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.context.annotation.Scope;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -42,14 +41,7 @@ public class PullServicesResponseHandler extends SimpleChannelInboundHandler<Res
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ResponseMessage<PullServicesResponse> msg) throws Exception {
         PullServicesResponse content = msg.content();
-        Set<RpcService> services = content.getRpcServices();
-        Set<RpcAddress> addressSet = content.getRpcAddressSet();
-        HashMap<RpcService, RpcAddress[]> map = new HashMap<>();
-        for (RpcService service : services) {
-            RpcAddress[] array = addressSet.stream().filter(x -> x.getServiceName().equals(service.getServiceName())).toArray(RpcAddress[]::new);
-            map.put(service,array);
-        }
-        rpcConsumer.addServices(map);
+        rpcConsumer.addServices(content.getAddressMap(),content.getMappingMap());
         Attribute<Object> attr = ctx.channel().attr(AttributeKey.valueOf(MessageUtil.CHANNEL_RESPONSE_MAP));
         ChannelResponse responseMap = (ChannelResponse) attr.get();
         log.info("get Pull Response");

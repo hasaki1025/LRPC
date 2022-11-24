@@ -35,7 +35,7 @@ public class PushMessageHandler extends SimpleChannelInboundHandler<BroadcastMes
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, BroadcastMessage<PushContent> msg) throws Exception {
         PushContent content = msg.content();
-        consumer.addService(content.getRpcService(),content.getRpcAddress());
+        consumer.addService(content.getRpcAddress(),content.getMappings());
         log.info("new Consumer Service List {}", Arrays.stream(consumer.getAllAddress()).toArray());
     }
 }

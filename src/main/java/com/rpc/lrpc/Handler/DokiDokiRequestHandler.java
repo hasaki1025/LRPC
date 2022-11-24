@@ -25,8 +25,6 @@ import org.springframework.stereotype.Component;
 
 public class DokiDokiRequestHandler extends SimpleChannelInboundHandler<RequestMessage<DokiDokiRequest>> {
 
-    @Value("${RPC.Provider.port}")
-    int port;
 
     @Autowired
     DokiDokiMap dokiDokiMap;

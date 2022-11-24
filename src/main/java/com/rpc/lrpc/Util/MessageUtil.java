@@ -88,16 +88,16 @@ public class MessageUtil {
 
        RequestContent content=null;
         if (msg.getCommandType().equals(CommandType.Call)) {
-            content = (DefaultCallServicesRequest)
+            content = (CallServicesRequest)
                     new ObjectMapper().readValue(msg.content(), CommandType.requestTypeClass[msg.getCommandType().getValue()]);
         }else if (msg.getCommandType().equals(CommandType.Register)){
-            content = (DefaultRegisterRequest)
+            content = (RegisterRequest)
                     new ObjectMapper().readValue(msg.content(), CommandType.requestTypeClass[msg.getCommandType().getValue()]);
         }else if (msg.getCommandType().equals(CommandType.DokiDoki)){
             content = (DokiDokiRequest)
                     new ObjectMapper().readValue(msg.content(), CommandType.requestTypeClass[msg.getCommandType().getValue()]);
         }else if (msg.getCommandType().equals(CommandType.Pull)){
-            content = (DefaultPullServicesRequest)
+            content = (PullServicesRequest)
                     new ObjectMapper().readValue(msg.content(), CommandType.requestTypeClass[msg.getCommandType().getValue()]);
         }
         return new RequestMessage<>(

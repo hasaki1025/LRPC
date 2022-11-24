@@ -5,7 +5,6 @@ import com.rpc.lrpc.Enums.CommandType;
 import com.rpc.lrpc.Enums.MessageType;
 import com.rpc.lrpc.message.Content.Request.CallServicesRequest;
 import com.rpc.lrpc.message.Content.Response.CallServicesResponse;
-import com.rpc.lrpc.message.Content.Response.DefaultCallServicesResponse;
 import com.rpc.lrpc.message.Message;
 import com.rpc.lrpc.message.RequestMessage;
 import com.rpc.lrpc.message.ResponseMessage;
@@ -39,7 +38,7 @@ public class CallServiceRequestHandler extends SimpleChannelInboundHandler<Reque
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, RequestMessage<CallServicesRequest> msg) {
-        DefaultCallServicesResponse response = new DefaultCallServicesResponse();
+        CallServicesResponse response = new CallServicesResponse();
         //TODO 在此处获取Mapping对应的方法和参数等信息
         try {
             log.info("get Call ServicesRequest:{}",msg);
@@ -52,7 +51,7 @@ public class CallServiceRequestHandler extends SimpleChannelInboundHandler<Reque
         }
         //并没有定义size
         ctx.writeAndFlush(
-                new ResponseMessage<CallServicesResponse>(CommandType.Call,MessageType.response,response,msg.getSeq())
+                new ResponseMessage<>(CommandType.Call, MessageType.response, response, msg.getSeq())
         );
     }
 }
