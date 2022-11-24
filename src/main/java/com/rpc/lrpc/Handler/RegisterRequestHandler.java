@@ -10,6 +10,7 @@ import com.rpc.lrpc.message.Content.Request.RegisterRequest;
 import com.rpc.lrpc.message.Content.Response.SimpleResponse;
 import com.rpc.lrpc.message.RequestMessage;
 import com.rpc.lrpc.message.ResponseMessage;
+import com.rpc.lrpc.net.DokiDokiMap;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -28,6 +29,9 @@ public class RegisterRequestHandler extends SimpleChannelInboundHandler<RequestM
 
     @Autowired
     RpcRegister rpcRegister;
+
+    @Autowired
+    DokiDokiMap dokiDokiMap;
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, RequestMessage<RegisterRequest> msg) throws JsonProcessingException {
         SimpleResponse response = new SimpleResponse();

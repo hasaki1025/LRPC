@@ -6,6 +6,7 @@ import com.rpc.lrpc.Enums.CommandType;
 import com.rpc.lrpc.Enums.MessageType;
 import com.rpc.lrpc.message.Content.Request.DokiDokiRequest;
 import com.rpc.lrpc.message.Content.Response.DokiDokiResponse;
+import com.rpc.lrpc.message.Content.Response.SimpleResponse;
 import com.rpc.lrpc.message.RequestMessage;
 import com.rpc.lrpc.message.ResponseMessage;
 import com.rpc.lrpc.message.RpcURL;
@@ -37,6 +38,15 @@ public class DokiDokiRequestHandler extends SimpleChannelInboundHandler<RequestM
     DokiDokiMap dokiDokiMap;
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, RequestMessage<DokiDokiRequest> msg) throws Exception {
-        dokiDokiMap.updateOrAddLastDokiTime(msg.content().getRpcURL());
+        SimpleResponse response = new SimpleResponse();
+        try
+        {
+            dokiDokiMap.updateOrAddLastDokiTime(msg.content().getRpcURL());
+        }catch (Exception e)
+        {
+            e.printStackTrace();
+            response.setException(e);
+        }
+        ctx.writeAndFlush(new ResponseMessage<>(CommandType.Simple, msg.getSeq(), MessageType.response, response));
     }
 }

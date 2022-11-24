@@ -42,6 +42,7 @@ public class RpcRegisterContext implements RpcRegister {
             rpcServiceMap.put(service,new RpcURL[]{rpcURL});
             serviceNameMap.put(service.getServiceName(),service);
         }
+        dokiDokiMap.addUrl(rpcURL);
     }
 
     @Override

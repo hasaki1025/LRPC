@@ -34,7 +34,7 @@ public class Client implements Closeable {
     {
         group=new NioEventLoopGroup();
         workerGroup=new DefaultEventLoopGroup();
-        ChannelFuture connect = new Bootstrap()
+            new Bootstrap()
                 .group(group)
                 .channel(io.netty.channel.socket.nio.NioSocketChannel.class)
                 .handler(new ChannelInitializer<>() {
@@ -46,12 +46,11 @@ public class Client implements Closeable {
                         pipeline.addLast(new LoggingHandler(LogLevel.INFO));
                         pipeline.addLast(handlersChain.toArray(new ChannelHandler[0]));
                     }
-                }).connect(host, port);
-        connect.addListener((ChannelFutureListener) future -> {
-            channel= future.channel();
-            log.info("Server: {}",channel.remoteAddress());
-            log.info("connect successfully....");
-        });
+                }).connect(host, port).addListener((ChannelFutureListener) future -> {
+                    channel=future.channel();
+                    channelInit();
+                });
+        //此时还没有获取到Channel，对于channel建立时需要的操作需要由子类实现
     }
 
     @Override
@@ -68,6 +67,12 @@ public class Client implements Closeable {
     int getNextSeq()
     {
         return seqCounter.getAndIncrement();
+    }
+
+    //在此定义channel建立后需要就行的操作
+    void channelInit()
+    {
+
     }
 
 }

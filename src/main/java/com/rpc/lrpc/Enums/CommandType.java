@@ -16,7 +16,7 @@ public enum CommandType {
             DefaultPushServicesRequest.class
     };
 
-    // TODO SimpleResponse需要添加
+
     public static final Class<?>[] responseTypeClass={
             DefaultCallServicesResponse.class,
             SimpleResponse.class,

@@ -40,4 +40,9 @@ public class DokiDokiMap {
         }
     }
 
+    public void addUrl(RpcURL url)
+    {
+        dokodoki.put(url,System.currentTimeMillis());
+    }
+
 }

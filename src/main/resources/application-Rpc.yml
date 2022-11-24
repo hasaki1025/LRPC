@@ -4,6 +4,7 @@ RPC:
     HeartCheckTime: 60 #每过60秒检查一次
     ExpireTime: 90 #过去多久算是过期
     HeartGap: 30 #发送心跳的间隔
+    RequestTimeOut: 10000
   Provider:
     port: 8080
     ServiceName: nihao

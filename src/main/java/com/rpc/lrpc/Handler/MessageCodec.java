@@ -1,5 +1,6 @@
 package com.rpc.lrpc.Handler;
 
+import com.rpc.lrpc.Enums.CommandType;
 import com.rpc.lrpc.Enums.MessageType;
 import com.rpc.lrpc.Exception.IncorrectMagicNumberException;
 import com.rpc.lrpc.Util.MessageUtil;
@@ -28,8 +29,15 @@ public class MessageCodec extends MessageToMessageCodec<ByteBuf,DefaultMessage> 
 
     @Override
     protected void encode(ChannelHandlerContext ctx, DefaultMessage msg, List<Object> out) throws Exception {
+
         ByteBuf buffer = ctx.alloc().buffer();
         MessageUtil.messageToByteBuf(msg,buffer);
+        if (msg.getMessageType().equals(MessageType.request))
+        {
+            //需要等待的响应
+            //心跳发送不需要响应
+            responseMap.addWaitingRequest(msg.getSeq());
+        }
         out.add(buffer);
     }
 
@@ -38,11 +46,14 @@ public class MessageCodec extends MessageToMessageCodec<ByteBuf,DefaultMessage> 
         try {
 
             Message message = MessageUtil.byteToMessage(msg);
-            //序号检查
-            if (!responseMap.stillWaiting(message.getSeq()))
+            if (message.getMessageType().equals(MessageType.response))
             {
-                responseMap.removeWaitingRequest(message.getSeq());
-                throw new RuntimeException("not match Request of this Response");
+                //序号检查
+                if (!responseMap.stillWaiting(message.getSeq()))
+                {
+                    responseMap.removeWaitingRequest(message.getSeq());
+                    throw new RuntimeException("not match Request of this Response");
+                }
             }
             out.add(message);
         } catch (IncorrectMagicNumberException e) {

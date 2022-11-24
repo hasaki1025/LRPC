@@ -11,6 +11,9 @@ public interface RpcConsumer {
     void addServices(Map<RpcService,RpcURL[]> map);
     void UpdateServices(RpcService rpcService,RpcURL rpcURL);
 
+    String getRegisterServerHost();
+    int getRegisterServerPort();
+
 
 
 
