@@ -2,6 +2,7 @@ package com.rpc.lrpc.Util;
 
 import com.rpc.lrpc.Enums.CommandType;
 import com.rpc.lrpc.Enums.MessageType;
+import com.rpc.lrpc.Enums.RpcRole;
 import com.rpc.lrpc.Enums.SerializableType;
 import com.rpc.lrpc.Exception.IncorrectMagicNumberException;
 import com.rpc.lrpc.message.*;
@@ -29,19 +30,16 @@ public class MessageUtil {
     public static MessageType messageType;
 
 
-
-
-    private static int seq=1;
-
-    public static DefaultMessage RequestToDefaultMessage(RequestMessage<RequestContent> requestMessage,String content)
+    public static DefaultMessage requestToDefaultMessage(RequestMessage<RequestContent> request, String content)
     {
-        return new DefaultMessage(requestMessage.getMagicNumber(),
-                requestMessage.getVersion(),
-                requestMessage.getSerializableType(),
-                requestMessage.getCommandType(),
-                content.getBytes(StandardCharsets.UTF_8).length,
-                requestMessage.getSeq(),
-                requestMessage.getMessageType(),
+        return new DefaultMessage(
+                request.getMagicNumber(),
+                request.getVersion(),
+                request.getSerializableType(),
+                request.getCommandType(),
+                request.size(),
+                request.getSeq(),
+                request.getMessageType(),
                 content
         );
     }
@@ -91,7 +89,6 @@ public class MessageUtil {
 
         buffer.writeByte((byte)message.getVersion());
 
-
         buffer.writeByte((byte)message.getSerializableType().getValue());
 
         buffer.writeByte((byte)message.getMessageType().getValue());
@@ -122,21 +119,7 @@ public class MessageUtil {
 
 
 
-    public static int getNextSeq()
-    {
-        return seq++;
-    }
 
-    public static Byte[] intToByteArray(int i)
-    {
-        Byte[] bytes = new Byte[4];
-
-        bytes[3]= (byte) (i | 0xff);
-        bytes[2]= (byte) (i>>8 | 0xff);
-        bytes[1]= (byte) (i>>8 | 0xff);
-        bytes[0]= (byte) (i>>8 | 0xff);
-        return bytes;
-    }
 
     public static RpcURL getUrlByString(String address)
     {

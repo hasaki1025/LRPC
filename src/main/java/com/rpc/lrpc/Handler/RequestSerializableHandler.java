@@ -26,11 +26,11 @@ public class RequestSerializableHandler extends MessageToMessageCodec<DefaultMes
 
 
 
-
     @Override
     protected void encode(ChannelHandlerContext ctx, RequestMessage<RequestContent> msg, List<Object> out) throws Exception {
         String s = new ObjectMapper().writeValueAsString(msg.content());
-        out.add(MessageUtil.RequestToDefaultMessage(msg, s));
+
+        out.add(MessageUtil.requestToDefaultMessage(msg, s));
     }
 
     @Override

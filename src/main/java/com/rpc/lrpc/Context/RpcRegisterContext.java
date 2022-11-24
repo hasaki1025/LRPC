@@ -25,9 +25,9 @@ public class RpcRegisterContext implements RpcRegister {
      @Value("${RPC.Register.port}")
       Integer port;
 
-     //TODO 心跳功能实现
      @Autowired
      DokiDokiMap dokiDokiMap;
+
 
 
     @Override
@@ -68,4 +68,6 @@ public class RpcRegisterContext implements RpcRegister {
         }
         return urls.toArray(new RpcURL[0]);
     }
+
+
 }

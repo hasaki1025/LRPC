@@ -1,5 +1,10 @@
 package com.rpc.lrpc.net;
 
+import com.rpc.lrpc.message.Content.MessageContent;
+import com.rpc.lrpc.message.Content.Request.PushServicesRequest;
+import com.rpc.lrpc.message.Content.Request.RequestContent;
+import com.rpc.lrpc.message.Message;
+import com.rpc.lrpc.message.RequestMessage;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.group.ChannelGroup;
@@ -12,6 +17,7 @@ import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.util.concurrent.GlobalEventExecutor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.io.Closeable;
@@ -20,24 +26,43 @@ import java.util.List;
 
 public class Server implements Closeable {
 
-    @Value("${RPC.Register.port}")
-    int port;
+    @Autowired
+    @Qualifier("group")
     EventLoopGroup bossGroup;
+    @Autowired
+    @Qualifier("chirdGroup")
     EventLoopGroup chirdGroup;
-    DefaultEventLoopGroup workerGrop;
+    @Autowired
+    @Qualifier("workerGroup")
+    DefaultEventLoopGroup workerGroup;
     ServerChannel serverChannel;
     @Autowired
     List<ChannelHandler> handlersChain;
 
     //用于保存所有连接
-    private final ChannelGroup channelGroup =new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
+    private final static ChannelGroup CHANNEL_GROUP =new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
+    private final static ChannelGroup CHANNEL_CONSUMER_GROUP =new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 
-    void NIOServerInit()
+    public  boolean containConsumerChannnel(Channel channel)
+    {
+        return CHANNEL_CONSUMER_GROUP.contains(channel);
+    }
+
+    public  void addConsumerChannel(Channel channel)
+    {
+        CHANNEL_CONSUMER_GROUP.add(channel);
+    }
+
+    public  void broadcastMessage(MessageContent content)
+    {
+        //TODO 广播消息
+    }
+
+
+    void init(int port)
     {
         try {
-            bossGroup=new NioEventLoopGroup(1);
-            chirdGroup=new NioEventLoopGroup();
-            workerGrop=new DefaultEventLoopGroup();
+
             new ServerBootstrap()
                     .group(bossGroup,chirdGroup)
                     .channel(NioServerSocketChannel.class)
@@ -45,11 +70,11 @@ public class Server implements Closeable {
 
                         @Override
                         public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
-                            channelGroup.add(ctx.channel());
+                            CHANNEL_GROUP.add(ctx.channel());
                         }
                         @Override
                         public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
-                            channelGroup.remove(ctx.channel());
+                            CHANNEL_GROUP.remove(ctx.channel());
                         }
                         @Override
                         protected void initChannel(NioSocketChannel ch) throws Exception {
@@ -90,11 +115,6 @@ public class Server implements Closeable {
             serverChannel.close().sync();
         } catch (InterruptedException e) {
             e.printStackTrace();
-        }
-        finally {
-            bossGroup.shutdownGracefully();
-            chirdGroup.shutdownGracefully();
-            workerGrop.shutdownGracefully();
         }
     }
 }

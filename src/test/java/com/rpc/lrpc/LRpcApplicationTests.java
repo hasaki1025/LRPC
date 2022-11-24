@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rpc.lrpc.Enums.CommandType;
 import com.rpc.lrpc.Enums.MessageType;
+import com.rpc.lrpc.Enums.RpcRole;
 import com.rpc.lrpc.Util.MessageUtil;
 import com.rpc.lrpc.message.Content.Request.DefaultCallServicesRequest;
 import com.rpc.lrpc.message.Content.Response.DefaultCallServicesResponse;
@@ -51,7 +52,7 @@ public class LRpcApplicationTests {
         //魔数（4）-版本号（1）-序列化算法（1）-消息类型（1）-指令类型(1)-请求序号(4)-正文长度(4)-消息本体
     //测试接受请求
     void getCallRequest() throws UnknownHostException, JsonProcessingException {
-        ArrayList<ChannelHandler> list = new ArrayList<>();
+       /* ArrayList<ChannelHandler> list = new ArrayList<>();
         list.add(new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 12, 4, 0, 0));
         list.add(new LoggingHandler(LogLevel.INFO));
         list.addAll(channelHandlers);
@@ -61,10 +62,10 @@ public class LRpcApplicationTests {
         request.setMapping("/test");
         request.setParamValues(new String[]{"123"});
         String s = new ObjectMapper().writeValueAsString(request);
-        DefaultMessage message = new DefaultMessage(CommandType.Call, s.getBytes(StandardCharsets.UTF_8).length, 1, MessageType.request, s);
+        //DefaultMessage message = new DefaultMessage(CommandType.);
         ByteBuf buffer = ByteBufAllocator.DEFAULT.buffer();
         MessageUtil.messageToByteBuf(message,buffer);
-        channel.writeInbound(buffer);
+        channel.writeInbound(buffer);*/
     }
 
 
@@ -82,7 +83,7 @@ public class LRpcApplicationTests {
         DefaultCallServicesResponse response = new DefaultCallServicesResponse();
         response.setResult("123");
         String s = new ObjectMapper().writeValueAsString(response);
-        DefaultMessage message = new DefaultMessage(CommandType.Call, s.getBytes(StandardCharsets.UTF_8).length, 1, MessageType.response, s);
+        DefaultMessage message = new DefaultMessage(CommandType.Call, s.getBytes(StandardCharsets.UTF_8).length, 1, MessageType.response, s,RpcRole.Provider);
         ByteBuf buffer = ByteBufAllocator.DEFAULT.buffer();
         MessageUtil.messageToByteBuf(message,buffer);
         channel.writeInbound(buffer);

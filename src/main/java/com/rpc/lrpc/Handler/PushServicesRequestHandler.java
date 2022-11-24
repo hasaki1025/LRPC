@@ -5,6 +5,7 @@ import com.rpc.lrpc.Context.RpcConsumer;
 import com.rpc.lrpc.Context.RpcRegister;
 import com.rpc.lrpc.Enums.CommandType;
 import com.rpc.lrpc.Enums.MessageType;
+import com.rpc.lrpc.Enums.RpcRole;
 import com.rpc.lrpc.message.Content.Request.PushServicesRequest;
 import com.rpc.lrpc.message.Content.Request.RequestContent;
 import com.rpc.lrpc.message.Content.Response.DefaultCallServicesResponse;
@@ -44,6 +45,6 @@ public class PushServicesRequestHandler extends SimpleChannelInboundHandler<Requ
             e.printStackTrace();
             response.setException(e);
         }
-        ctx.writeAndFlush(new ResponseMessage<>(CommandType.Simple, msg.getSeq(), MessageType.request, response));
+        ctx.writeAndFlush(new ResponseMessage<>(CommandType.Simple, msg.getSeq(), MessageType.response, response, RpcRole.Consumer));
     }
 }

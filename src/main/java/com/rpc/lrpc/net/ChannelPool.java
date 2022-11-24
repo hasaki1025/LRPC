@@ -26,7 +26,7 @@ public class ChannelPool {
     //连接锁，防止connection重复创建
     private volatile ConcurrentHashMap<String,Object> connectionLocks=new ConcurrentHashMap<>();
 
-    @Value("${Rpc.Config.ChannelType}")
+    @Value("${RPC.Config.ChannelType:NIO}")
     String channelType;
 
     @Autowired
@@ -34,6 +34,7 @@ public class ChannelPool {
     EventLoopGroup group;
 
     @Autowired
+    @Qualifier("rpcConsumerChannelInitializer")
     ChannelInitializer<?> channelInitializer;
     @Autowired
     @Qualifier("workerGroup")
@@ -44,7 +45,8 @@ public class ChannelPool {
     @Autowired
     ResponseMap responseMap;
 
-    public Client getConnection(String address,Class<? extends ConsumerClient> clientImpl) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+    //TODO clientImpl的class需要设置吗
+    public Client getConnection(String address,Class<? extends Client> clientImpl) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         if (connectionPool==null) {
             synchronized (this) {
                 if (connectionPool==null) {

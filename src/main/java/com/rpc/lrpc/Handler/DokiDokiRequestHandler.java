@@ -4,6 +4,7 @@ import com.rpc.lrpc.Context.RPCServiceProvider;
 import com.rpc.lrpc.Context.RpcRegister;
 import com.rpc.lrpc.Enums.CommandType;
 import com.rpc.lrpc.Enums.MessageType;
+import com.rpc.lrpc.Enums.RpcRole;
 import com.rpc.lrpc.message.Content.Request.DokiDokiRequest;
 import com.rpc.lrpc.message.Content.Response.DokiDokiResponse;
 import com.rpc.lrpc.message.Content.Response.SimpleResponse;
@@ -47,6 +48,5 @@ public class DokiDokiRequestHandler extends SimpleChannelInboundHandler<RequestM
             e.printStackTrace();
             response.setException(e);
         }
-        ctx.writeAndFlush(new ResponseMessage<>(CommandType.Simple, msg.getSeq(), MessageType.response, response));
     }
 }

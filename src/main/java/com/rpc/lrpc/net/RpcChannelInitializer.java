@@ -1,11 +1,13 @@
 package com.rpc.lrpc.net;
 
 import com.rpc.lrpc.Context.RpcConsumer;
+import com.rpc.lrpc.Enums.RpcRole;
 import io.netty.channel.*;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
+import io.netty.util.AttributeKey;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -14,19 +16,11 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
-@ConditionalOnBean(RpcConsumer.class)
-@Component
 @Slf4j
-public class ConsumerChannelInitializer extends ChannelInitializer<Channel> {
+public class RpcChannelInitializer extends ChannelInitializer<Channel> {
 
-
-    @Autowired
-    @Qualifier("workerGroup")
-    DefaultEventLoopGroup workerGroup;
-
-    @Autowired
-    RpcConsumer consumer;
 
     @Autowired
     List<ChannelHandler> handlersChain;
@@ -39,6 +33,7 @@ public class ConsumerChannelInitializer extends ChannelInitializer<Channel> {
                 new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE,12,4,0,0));
         pipeline.addLast(new LoggingHandler(LogLevel.INFO));
         pipeline.addLast(handlersChain.toArray(new ChannelHandler[0]));
-        log.info("connect successfully....");
+        //设置计数器
+        ch.attr(AttributeKey.valueOf("SeqCounter")).set(new AtomicInteger());
     }
 }

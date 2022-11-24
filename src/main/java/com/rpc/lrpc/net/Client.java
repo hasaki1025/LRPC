@@ -1,14 +1,13 @@
 package com.rpc.lrpc.net;
 
+
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
-import lombok.Data;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.util.concurrent.atomic.AtomicInteger;
 
 
 @Slf4j
@@ -20,13 +19,12 @@ public class Client implements Closeable {
 
     final DefaultEventLoopGroup workerGroup;
     Channel channel;
-    final ChannelInitializer<? extends Channel> channelInitializer;
+    final RpcChannelInitializer channelInitializer;
 
-    private final AtomicInteger seqCounter=new AtomicInteger();
 
     private final ResponseMap responseMap;
 
-    public Client(EventLoopGroup group, DefaultEventLoopGroup workerGroup,ChannelInitializer<? extends Channel> channelInitializer,ResponseMap responseMap) {
+    public Client(EventLoopGroup group, DefaultEventLoopGroup workerGroup, RpcChannelInitializer channelInitializer, ResponseMap responseMap) {
         this.group = group;
         this.workerGroup = workerGroup;
         this.channelInitializer = channelInitializer;
@@ -50,11 +48,6 @@ public class Client implements Closeable {
         channel.close().addListener((ChannelFutureListener) future -> {
             log.info("connect close.....");
         });
-    }
-
-    public int getNextSeq()
-    {
-        return seqCounter.getAndIncrement();
     }
 
 

@@ -14,7 +14,17 @@ import java.util.stream.Stream;
 @Data
 public class DefaultPushServicesRequest implements PushServicesRequest {
 
-   final Map<RpcService,RpcURL[]> servicesMap=new HashMap<>();
+    RpcService rpcService;
+    RpcURL rpcURL;
 
 
+   @Override
+   public void setRpcService(RpcService service) {
+      this.rpcService=service;
+   }
+
+   @Override
+   public void setRpcURL(RpcURL url) {
+      this.rpcURL=url;
+   }
 }

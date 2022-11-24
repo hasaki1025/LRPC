@@ -7,5 +7,9 @@ import java.util.Map;
 
 public interface PushServicesRequest extends RequestContent{
 
-    Map<RpcService,RpcURL[]> getServicesMap();
+   RpcService getRpcService();
+   RpcURL getRpcURL();
+
+   void setRpcService(RpcService service);
+   void setRpcURL(RpcURL url);
 }

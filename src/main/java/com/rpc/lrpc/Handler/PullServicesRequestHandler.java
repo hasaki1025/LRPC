@@ -3,6 +3,7 @@ package com.rpc.lrpc.Handler;
 import com.rpc.lrpc.Context.RpcRegister;
 import com.rpc.lrpc.Enums.CommandType;
 import com.rpc.lrpc.Enums.MessageType;
+import com.rpc.lrpc.Enums.RpcRole;
 import com.rpc.lrpc.message.Content.Request.PullServicesRequest;
 import com.rpc.lrpc.message.Content.Response.DefaultPullServicesResponse;
 import com.rpc.lrpc.message.Content.Response.PullServicesResponse;
@@ -35,6 +36,6 @@ public class PullServicesRequestHandler extends SimpleChannelInboundHandler<Requ
             e.printStackTrace();
             response.setException(e);
         }
-        ctx.writeAndFlush(new ResponseMessage<>(CommandType.Pull, msg.getSeq(), MessageType.response, response));
+        ctx.writeAndFlush(new ResponseMessage<>(CommandType.Pull, msg.getSeq(), MessageType.response, response, RpcRole.Register));
     }
 }

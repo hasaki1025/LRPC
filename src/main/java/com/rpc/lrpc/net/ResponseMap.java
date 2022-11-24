@@ -1,12 +1,11 @@
 package com.rpc.lrpc.net;
 
+import com.rpc.lrpc.message.Content.Response.CallServicesResponse;
 import com.rpc.lrpc.message.Content.Response.ResponseContent;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArraySet;
 
 
 @Component
@@ -26,7 +25,7 @@ public class ResponseMap {
         WAITING_MAP.put(seq, new Object());
     }
 
-    public void removeWaitingRequest(int seq)
+    public void removeWaitingRequestSync(int seq)
     {
         synchronized (WAITING_MAP.get(seq))
         {
@@ -39,12 +38,23 @@ public class ResponseMap {
             }
         }
     }
+    public void removeWaitingRequest(int seq)
+    {
+       WAITING_MAP.remove(seq);
+    }
 
 
     public void putResponse(int seq,ResponseContent content)
     {
         responseMap.put(seq, content);
-        removeWaitingRequest(seq);
+        if (content instanceof CallServicesResponse)
+        {
+            removeWaitingRequestSync(seq);
+        }
+        else {
+            removeWaitingRequest(seq);
+        }
+
     }
 
     public ResponseContent getResponse(int seq)

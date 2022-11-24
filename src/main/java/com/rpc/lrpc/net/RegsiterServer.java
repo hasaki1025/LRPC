@@ -29,6 +29,8 @@ import java.util.concurrent.TimeUnit;
 @ConditionalOnBean(RpcRegister.class)
 public class RegsiterServer  extends Server{
 
+    @Value("${RPC.Register.port}")
+    int port;
     @Autowired
     ResponseMap responseMap;
     @Autowired
@@ -39,13 +41,18 @@ public class RegsiterServer  extends Server{
     int heartCheckTime;
 
     @Override
-    void NIOServerInit() {
+    void init(int port) {
         dokiDokiMap.addAllUrl(register.getAllUrl());
-        workerGrop.scheduleWithFixedDelay(()->{
+        workerGroup.scheduleWithFixedDelay(()->{
             for (RpcURL url : register.getAllUrl()) {
                 dokiDokiMap.checkUrlIsExpire(url);
             }
         },0,heartCheckTime, TimeUnit.SECONDS);
+    }
+
+    void init()
+    {
+        this.init(port);
     }
 
 }

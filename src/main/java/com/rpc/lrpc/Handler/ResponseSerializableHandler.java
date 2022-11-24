@@ -37,9 +37,6 @@ public class ResponseSerializableHandler extends MessageToMessageCodec<DefaultMe
     protected void decode(ChannelHandlerContext ctx, DefaultMessage msg, List<Object> out) throws Exception {
         if(MessageType.response.equals(msg.getMessageType()))
         {
-            String content = msg.content();
-            SerializableType type = msg.getSerializableType();
-            CommandType commandType = msg.getCommandType();
             Object value = new ObjectMapper().readValue(msg.content(), CommandType.responseTypeClass[msg.getCommandType().getValue()]);
             //注意从这之后就只有
             out.add(new ResponseMessage<>(msg, (ResponseContent) value));
