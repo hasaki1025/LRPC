@@ -27,19 +27,22 @@ public class DokiDokiMap {
 
     public void updateOrAddLastDokiTime(RpcAddress url)
     {
-        dokodoki.put(url,System.currentTimeMillis());
+        if (dokodoki.containsKey(url)) {
+            dokodoki.put(url,System.currentTimeMillis());
+        }
+
     }
 
     public void addAllUrl(RpcAddress[] urls)
     {
         for (RpcAddress url : urls) {
-            dokodoki.put(url,System.currentTimeMillis());
+            this.addUrl(url);
         }
     }
 
     public void addUrl(RpcAddress url)
     {
-        dokodoki.put(url,System.currentTimeMillis());
+        dokodoki.putIfAbsent(url,System.currentTimeMillis());
     }
 
 }

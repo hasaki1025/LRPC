@@ -6,8 +6,8 @@ import com.rpc.lrpc.message.RpcAddress;
 public interface PushServicesRequest extends RequestContent{
 
    RpcService getRpcService();
-   RpcAddress getRpcURL();
+   RpcAddress getRpcAddress();
 
    void setRpcService(RpcService service);
-   void setRpcURL(RpcAddress url);
+   void setRpcAddress(RpcAddress url);
 }

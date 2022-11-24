@@ -7,5 +7,5 @@ public interface RegisterRequest extends RequestContent {
 
     RpcService getRpcService();
 
-    RpcAddress getRpcURL();
+    RpcAddress getRpcAddress();
 }

@@ -19,6 +19,8 @@ public interface RpcRegister {
 
     RpcAddress[] getAllUrl();
 
+    void removeAddress(RpcAddress rpcAddress);
+
 
 
 

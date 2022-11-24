@@ -1,8 +1,14 @@
 package com.rpc.lrpc.Context;
 
+import com.rpc.lrpc.Enums.CommandType;
+import com.rpc.lrpc.Enums.MessageType;
+import com.rpc.lrpc.message.Content.Request.DefaultPushServicesRequest;
+import com.rpc.lrpc.message.Content.Request.PushServicesRequest;
+import com.rpc.lrpc.message.RequestMessage;
 import com.rpc.lrpc.message.RpcService;
 import com.rpc.lrpc.message.RpcAddress;
 import com.rpc.lrpc.net.DokiDokiMap;
+import com.rpc.lrpc.net.Server;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,6 +17,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 @Data
 @ConditionalOnProperty(name = {
@@ -20,6 +27,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class RpcRegisterContext implements RpcRegister {
      final Map<RpcService, RpcAddress[]> rpcServiceMap=new ConcurrentHashMap<>();
      final Map<String,RpcService> serviceNameMap=new ConcurrentHashMap<>();
+
+     final Set<RpcAddress> addressSet=new CopyOnWriteArraySet<>();
 
      @Value("${RPC.Register.port}")
       Integer port;
@@ -42,6 +51,12 @@ public class RpcRegisterContext implements RpcRegister {
             serviceNameMap.put(service.getServiceName(),service);
         }
         dokiDokiMap.addUrl(rpcAddress);
+        addressSet.add(rpcAddress);
+        //发送广播
+        DefaultPushServicesRequest request = new DefaultPushServicesRequest();
+        request.setRpcService(service);
+        request.setRpcAddress(rpcAddress);
+        Server.broadcastMessage(new RequestMessage<PushServicesRequest>(CommandType.Push, MessageType.request,request));
     }
 
     @Override
@@ -66,6 +81,28 @@ public class RpcRegisterContext implements RpcRegister {
             urls.addAll(List.of(rpcServiceMap.get(value)));
         }
         return urls.toArray(new RpcAddress[0]);
+    }
+
+    @Override
+    public void removeAddress(RpcAddress rpcAddress) {
+        if (!addressSet.remove(rpcAddress)) {
+            throw new RuntimeException("Do not have this rpcaddress");
+        }
+
+        String serviceName = rpcAddress.getServiceName();
+        if (serviceName==null || serviceName.equals(""))
+        {
+            throw new RuntimeException("Do not have this rpcaddress");
+        }
+        RpcService service = serviceNameMap.get(serviceName);
+        RpcAddress[] addresses = rpcServiceMap.get(service);
+        if (addresses.length==1 && addresses[0].equals(rpcAddress)) {
+            rpcServiceMap.remove(service);
+            serviceNameMap.remove(serviceName);
+        }else {
+
+        }
+
     }
 
 

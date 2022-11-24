@@ -34,22 +34,13 @@ public class RegisterRequestHandler extends SimpleChannelInboundHandler<RequestM
     RpcRegister rpcRegister;
 
     @Autowired
-    DokiDokiMap dokiDokiMap;
-    @Autowired
     @Qualifier("workerGroup")
     DefaultEventLoopGroup workerGroup;
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, RequestMessage<RegisterRequest> msg) throws JsonProcessingException {
         SimpleResponse response = new SimpleResponse();
         try {
-            rpcRegister.registerService(msg.content().getRpcService(),msg.content().getRpcURL());
-            //TODO 发送广播通知其他Channel
-            workerGroup.submit(()->{
-                DefaultPushServicesRequest request = new DefaultPushServicesRequest();
-                request.setRpcService(msg.content().getRpcService());
-                request.setRpcAddress(msg.content().getRpcURL());
-                RegisterServer.broadcastMessage(new RequestMessage<PushServicesRequest>(CommandType.Push,MessageType.request,request));
-            });
+            rpcRegister.registerService(msg.content().getRpcService(),msg.content().getRpcAddress());
         }catch (Exception e)
         {
             e.printStackTrace();

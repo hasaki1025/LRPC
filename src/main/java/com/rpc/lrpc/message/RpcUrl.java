@@ -9,6 +9,7 @@ public class RpcUrl {
 
 
 
+
     public RpcUrl(RpcAddress address, String mapping) {
         this.address = address;
         this.mapping = mapping;

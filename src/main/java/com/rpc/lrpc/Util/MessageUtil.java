@@ -172,29 +172,43 @@ public class MessageUtil {
     }
 
 
-
-
-
-    public static RpcAddress getUrlByString(String address)
-    {
-        if (!address.startsWith("rpc://") || !address.contains(":"))
-        {
-            throw new RuntimeException("Not correct URL");
-        }
-        String s = address.substring(0, 6);
-        String[] split = s.split(":");
-        if (!split[0].contains("."))
-        {
-            throw new RuntimeException("Not correct URL");
-        }
-        RpcAddress url = new RpcAddress();
-        url.setHost(split[0]);
-        url.setPort(Integer.parseInt(split[1]));
-        return url;
-    }
+    /**
+     * 解析Url地址为RpcURL实体类,URL格式为rpc://ip:端口/服务名称/mapping
+     * @param url String类型请求url
+     * @return URL实体类
+     */
+   public static RpcUrl parseUrl(String url)
+   {
+       if (!url.startsWith("rpc://") || !url.contains(":"))
+       {
+           throw new RuntimeException("Not correct URL");
+       }
+       String s = url.substring(6);
+       String[] split = s.split(":");
+       if (split.length!=2)
+       {
+           throw new RuntimeException("Not correct URL");
+       }
+       String host=split[0];
+       int i = split[1].indexOf("/");
+       assert i!=-1;
+       int port = Integer.parseInt(split[1].substring(0, i));
+       String serviceNameAndMapping = split[1].substring(i + 1);
+       int i1 = serviceNameAndMapping.indexOf("/");
+       String mapping="";
+       String serviceName;
+       if (i1!=-1) {
+           mapping=serviceNameAndMapping.substring(i1);
+           serviceName=serviceNameAndMapping.substring(0,i1);
+       }
+       else {
+           serviceName=serviceNameAndMapping;
+       }
+       return new RpcUrl(new RpcAddress(host, port,serviceName), mapping);
+   }
 
     /**
-     * 解析Rpc请求地址如:rpc://ip:端口/服务名称/mapping
+     * 解析Rpc请求的远程地址如:rpc://ip:端口
      * @param address RPC请求地址
      * @return 拆分后的地址
      */
@@ -204,12 +218,8 @@ public class MessageUtil {
         {
             throw new RuntimeException("Not correct URL");
         }
-        String s = address.substring(0, 6);
+        String s = address.substring(6);
         String[] split = s.split(":");
-        if (!split[0].contains("."))
-        {
-            throw new RuntimeException("Not correct URL");
-        }
         String host=split[0];
         String port=split[1];
         return new RpcAddress(host,Integer.parseInt(port));

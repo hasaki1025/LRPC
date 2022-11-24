@@ -11,12 +11,11 @@ public class DefaultPushServicesRequest implements PushServicesRequest {
     RpcAddress rpcAddress;
 
 
-   @Override
+
+    @Override
    public void setRpcService(RpcService service) {
       this.rpcService=service;
    }
 
-   public void setRpcAddress(RpcAddress url) {
-      this.rpcAddress =url;
-   }
+
 }

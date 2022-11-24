@@ -5,9 +5,9 @@ import com.rpc.lrpc.message.RpcAddress;
 
 public interface UpdateServiceResponse extends ResponseContent{
 
-    RpcAddress[] getRpcUrls();
+    RpcAddress[] getRpcAddresses();
     RpcService getRpcService();
 
     void setRpcService(RpcService rpcService);
-    void setRpcUrls(RpcAddress[] rpcAddresses);
+    void setRpcAddresses(RpcAddress[] rpcAddresses);
 }

@@ -3,6 +3,7 @@ package com.rpc.lrpc.net;
 import com.rpc.lrpc.Context.RpcConsumer;
 import com.rpc.lrpc.Util.MessageUtil;
 import com.rpc.lrpc.message.RpcAddress;
+import com.rpc.lrpc.message.RpcUrl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.stereotype.Component;
@@ -22,22 +23,23 @@ public class RPCRequestSender {
     public  Object callSync(String url,Object...params)
     {
         try {
-            RpcAddress rpcAddress = MessageUtil.parseAddress(address);
-            if (!consumer.containAddress(rpcAddress)) {
+            RpcUrl rpcUrl = MessageUtil.parseUrl(url);
+            if (!consumer.containAddress(rpcUrl.getAddress())) {
+                //TODO 如果消费者中不含有该地址信息则同步发送Update并获取结果
 
             }
-            ConsumerClient client = channelPool.getConnection(address, ConsumerClient.class);
-            return client.callSync(params, rpcAddress.getMapping());
+            ConsumerClient client = channelPool.getConnection(rpcUrl.getAddress().toString(), ConsumerClient.class);
+            return client.callSync(params, rpcUrl.getMapping());
         } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
     }
-    public  <T>void call(String address, Consumer<T> consumer, Object...params)
+    public  <T>void call(String url, Consumer<T> consumer, Object...params)
     {
         try {
-            RpcAddress rpcAddress = MessageUtil.parseAddress(address);
-            ConsumerClient client = channelPool.getConnection(address, ConsumerClient.class);
-            client.call(params, rpcAddress.getMapping(),consumer);
+            RpcUrl rpcUrl = MessageUtil.parseUrl(url);
+            ConsumerClient client = channelPool.getConnection(rpcUrl.getAddress().toString(), ConsumerClient.class);
+            client.call(params, rpcUrl.getMapping(),consumer);
         } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }

@@ -3,7 +3,6 @@ package com.rpc.lrpc.Handler;
 import com.rpc.lrpc.Context.RpcConsumer;
 import com.rpc.lrpc.Enums.CommandType;
 import com.rpc.lrpc.Enums.MessageType;
-import com.rpc.lrpc.Enums.RpcRole;
 import com.rpc.lrpc.message.Content.Request.PushServicesRequest;
 import com.rpc.lrpc.message.Content.Response.SimpleResponse;
 import com.rpc.lrpc.message.RequestMessage;
@@ -30,7 +29,7 @@ public class PushServicesRequestHandler extends SimpleChannelInboundHandler<Requ
     protected void channelRead0(ChannelHandlerContext ctx, RequestMessage<PushServicesRequest> msg) throws Exception {
         SimpleResponse response = new SimpleResponse();
         try{
-            rpcConsumer.addService(msg.content().getRpcService(),msg.content().getRpcURL());
+            rpcConsumer.addService(msg.content().getRpcService(),msg.content().getRpcAddress());
         }catch (Exception e)
         {
             e.printStackTrace();

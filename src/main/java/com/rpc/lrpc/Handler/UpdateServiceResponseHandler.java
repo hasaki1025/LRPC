@@ -30,7 +30,7 @@ public class UpdateServiceResponseHandler extends SimpleChannelInboundHandler<Re
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ResponseMessage<UpdateServiceResponse> msg) throws Exception {
         if (!msg.content().hasException()) {
-            RpcAddress[] urls = msg.content().getRpcUrls();
+            RpcAddress[] urls = msg.content().getRpcAddresses();
             RpcService rpcService = msg.content().getRpcService();
             HashMap<RpcService, RpcAddress[]> map = new HashMap<>();
             map.put(rpcService,urls);

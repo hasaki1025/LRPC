@@ -39,7 +39,7 @@ public class UpdateServiceRequestHandler extends SimpleChannelInboundHandler<Req
             String serviceName = msg.content().getServiceName();
             RpcService service = rpcRegister.getService(serviceName);
             response.setRpcService(service);
-            response.setRpcUrls(rpcRegister.getRpcUrlsByName(serviceName));
+            response.setRpcAddresses(rpcRegister.getRpcUrlsByName(serviceName));
         }catch (Exception e)
         {
             e.printStackTrace();
