@@ -12,6 +12,7 @@ import com.rpc.lrpc.message.RequestMessage;
 import com.rpc.lrpc.message.ResponseMessage;
 import com.rpc.lrpc.message.RpcService;
 import com.rpc.lrpc.message.RpcURL;
+import com.rpc.lrpc.net.Server;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -33,7 +34,11 @@ public class UpdateServiceRequestHandler extends SimpleChannelInboundHandler<Req
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, RequestMessage<UpdateServiceRequest> msg) throws Exception {
         UpdateServiceResponse response = new DefaultUpdateServiceResponse();
+
         try{
+            if (!Server.containConsumerChannnel(ctx.channel())) {
+                Server.addConsumerChannel(ctx.channel());
+            }
             String serviceName = msg.content().getServiceName();
             RpcService service = rpcRegister.getService(serviceName);
             response.setRpcService(service);

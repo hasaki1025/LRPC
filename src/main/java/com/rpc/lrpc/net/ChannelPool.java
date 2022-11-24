@@ -4,6 +4,7 @@ import com.rpc.lrpc.Context.RpcConsumer;
 import com.rpc.lrpc.Enums.ChannelType;
 import com.rpc.lrpc.Util.MessageUtil;
 import com.rpc.lrpc.message.RpcURL;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.DefaultEventLoopGroup;
 import io.netty.channel.EventLoopGroup;
@@ -14,6 +15,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 @Component
 @ConditionalOnBean(RpcConsumer.class)
@@ -32,8 +34,6 @@ public class ChannelPool {
     @Qualifier("group")
     EventLoopGroup group;
 
-    @Autowired
-    @Qualifier("rpcClientChannelInitializer")
     ChannelInitializer<?> channelInitializer;
     @Autowired
     @Qualifier("workerGroup")
@@ -43,6 +43,8 @@ public class ChannelPool {
     RpcConsumer rpcConsumer;
     @Autowired
     ResponseMap responseMap;
+    @Autowired
+    List<ChannelHandler> handlers;
 
     //TODO clientImpl的class需要设置吗
     public<T> T getConnection(String address,Class<T> clientImpl) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
@@ -70,6 +72,9 @@ public class ChannelPool {
                 return (T) client;
             }
 
+            if (channelInitializer==null) {
+                channelInitializer=new RpcClientChannelInitializer(handlers);
+            }
             Client instance = (Client) clientImpl
                     .getDeclaredConstructor(EventLoopGroup.class, DefaultEventLoopGroup.class, ChannelInitializer.class,RpcConsumer.class,ResponseMap.class)
                     .newInstance(group,defaultEventLoopGroup,channelInitializer,rpcConsumer,responseMap);

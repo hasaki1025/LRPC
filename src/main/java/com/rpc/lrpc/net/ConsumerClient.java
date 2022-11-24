@@ -5,10 +5,12 @@ import com.rpc.lrpc.Enums.MessageType;
 import com.rpc.lrpc.message.Content.Request.*;
 import com.rpc.lrpc.message.RequestMessage;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.DefaultEventLoopGroup;
 import io.netty.channel.EventLoopGroup;
 import io.netty.util.AttributeKey;
 
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
@@ -27,8 +29,8 @@ public class ConsumerClient extends Client {
         }
     }
 
-    public ConsumerClient(EventLoopGroup group, DefaultEventLoopGroup workerGroup, RpcClientChannelInitializer channelInitializer, ResponseMap responseMap) {
-        super(group, workerGroup, channelInitializer, responseMap);
+    public ConsumerClient(EventLoopGroup group, DefaultEventLoopGroup workerGroup, List<ChannelHandler> handlers, ResponseMap responseMap) {
+        super(group, workerGroup, handlers, responseMap);
     }
 
 

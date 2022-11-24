@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.util.List;
 
 
 @Slf4j
@@ -24,10 +25,10 @@ public class Client implements Closeable {
 
      final ResponseMap responseMap;
 
-    public Client(EventLoopGroup group, DefaultEventLoopGroup workerGroup, RpcClientChannelInitializer channelInitializer, ResponseMap responseMap) {
+    public Client(EventLoopGroup group, DefaultEventLoopGroup workerGroup, List<ChannelHandler> handlers, ResponseMap responseMap) {
         this.group = group;
         this.workerGroup = workerGroup;
-        this.channelInitializer = channelInitializer;
+        this.channelInitializer = new RpcClientChannelInitializer(handlers);
         this.responseMap=responseMap;
     }
 

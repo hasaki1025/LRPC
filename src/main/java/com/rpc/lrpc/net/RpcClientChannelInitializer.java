@@ -14,15 +14,16 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-@Slf4j
-@Component
-@ConditionalOnProperty({"RPC.Server.Host","RPC.Server.port"})
+
 public class RpcClientChannelInitializer extends ChannelInitializer<Channel> {
 
 
-    @Autowired
+
     List<ChannelHandler> handlersChain;
 
+    public RpcClientChannelInitializer(List<ChannelHandler> handlersChain) {
+        this.handlersChain = handlersChain;
+    }
 
     @Override
     protected void initChannel(Channel ch) throws Exception {

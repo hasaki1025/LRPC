@@ -41,19 +41,19 @@ public class Server implements Closeable {
     private final static ChannelGroup CHANNEL_CONSUMER_GROUP =new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 
 
-    public  boolean containConsumerChannnel(Channel channel)
+    public static boolean containConsumerChannnel(Channel channel)
     {
         return CHANNEL_CONSUMER_GROUP.contains(channel);
     }
 
-    public  void addConsumerChannel(Channel channel)
+    public static void addConsumerChannel(Channel channel)
     {
         CHANNEL_CONSUMER_GROUP.add(channel);
     }
 
-    public  void broadcastMessage(MessageContent content)
+    public  static void broadcastMessage(Message message)
     {
-        //TODO 广播消息
+        CHANNEL_CONSUMER_GROUP.writeAndFlush(message);
     }
 
 

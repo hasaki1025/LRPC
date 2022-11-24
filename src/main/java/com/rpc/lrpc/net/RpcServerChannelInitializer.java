@@ -14,9 +14,13 @@ import java.util.List;
 
 public class RpcServerChannelInitializer extends ChannelInitializer<Channel> {
 
-    @Autowired
+
     List<ChannelHandler> handlersChain;
 
+
+    public RpcServerChannelInitializer(List<ChannelHandler> handlersChain) {
+        this.handlersChain = handlersChain;
+    }
 
     @Override
     protected void initChannel(Channel ch) throws Exception {

@@ -9,6 +9,7 @@ import com.rpc.lrpc.message.Content.Response.DefaultPullServicesResponse;
 import com.rpc.lrpc.message.Content.Response.PullServicesResponse;
 import com.rpc.lrpc.message.RequestMessage;
 import com.rpc.lrpc.message.ResponseMessage;
+import com.rpc.lrpc.net.Server;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -28,7 +29,12 @@ public class PullServicesRequestHandler extends SimpleChannelInboundHandler<Requ
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, RequestMessage<PullServicesRequest> msg) throws Exception {
         PullServicesResponse response = new DefaultPullServicesResponse();
-        try{
+        try
+        {
+            //添加ConsumerChannel
+            if (!Server.containConsumerChannnel(ctx.channel())) {
+                Server.addConsumerChannel(ctx.channel());
+            }
             response.addRpcService(rpcRegister.getRpcServiceMap());
         }
         catch (Exception e)

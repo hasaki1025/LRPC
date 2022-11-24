@@ -8,6 +8,7 @@ import com.rpc.lrpc.message.Content.Request.DefaultRegisterRequest;
 import com.rpc.lrpc.message.Content.Request.DokiDokiRequest;
 import com.rpc.lrpc.message.Content.Request.RegisterRequest;
 import com.rpc.lrpc.message.RequestMessage;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.DefaultEventLoopGroup;
 import io.netty.channel.EventLoopGroup;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @ConditionalOnBean(RPCServiceProvider.class)
@@ -22,8 +24,8 @@ import java.util.concurrent.TimeUnit;
 public class ProviderClient extends Client {
     private boolean isInit=false;
     @Autowired
-    public ProviderClient(EventLoopGroup group, DefaultEventLoopGroup workerGroup,  RpcClientChannelInitializer channelInitializer, ResponseMap responseMap) {
-        super(group, workerGroup, channelInitializer, responseMap);
+    public ProviderClient(EventLoopGroup group, DefaultEventLoopGroup workerGroup, List<ChannelHandler> handlers, ResponseMap responseMap) {
+        super(group, workerGroup, handlers, responseMap);
     }
     @Autowired
     RPCServiceProvider provider;
