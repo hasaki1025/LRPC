@@ -8,6 +8,7 @@ import com.rpc.lrpc.Util.MessageUtil;
 import com.rpc.lrpc.message.Content.Request.RequestContent;
 import com.rpc.lrpc.message.Content.Response.ResponseContent;
 import com.rpc.lrpc.message.DefaultMessage;
+import com.rpc.lrpc.message.Message;
 import com.rpc.lrpc.message.RequestMessage;
 import com.rpc.lrpc.message.ResponseMessage;
 import io.netty.channel.ChannelHandler;
@@ -25,16 +26,33 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
 @ChannelHandler.Sharable
-@Order(1)
+@Order(2)
 @Slf4j
 
 public class ResponseSerializableHandler extends MessageToMessageCodec<DefaultMessage, ResponseMessage<ResponseContent>> {
 
 
     @Override
+    public boolean acceptOutboundMessage(Object msg) throws Exception {
+        return super.acceptOutboundMessage(msg) && ((Message)msg).getMessageType().equals(MessageType.response);
+    }
+
+    @Override
+    public boolean acceptInboundMessage(Object msg) throws Exception {
+        return super.acceptInboundMessage(msg) && ((Message)msg).getMessageType().equals(MessageType.response);
+    }
+
+    @Override
     protected void encode(ChannelHandlerContext ctx, ResponseMessage<ResponseContent> msg, List<Object> out) throws Exception {
-        log.info("send {} Response",msg.getCommandType().name());
-        out.add(MessageUtil.rpcResponseToDefaultMessage(msg));
+        if (msg.getMessageType().equals(MessageType.response))
+        {
+            log.info("send {} Response",msg.getCommandType().name());
+            out.add(MessageUtil.rpcResponseToDefaultMessage(msg));
+        }
+        else {
+            out.add(msg);
+        }
+
     }
 
     @Override

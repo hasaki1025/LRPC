@@ -22,7 +22,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 @ChannelHandler.Sharable
 @Component
-@Order(0)
+@Order(1)
 @Slf4j
 public class MessageCodec extends MessageToMessageCodec<ByteBuf,DefaultMessage> {
 

@@ -7,6 +7,9 @@ import com.rpc.lrpc.Enums.MessageType;
 import com.rpc.lrpc.Enums.SerializableType;
 import com.rpc.lrpc.Exception.IncorrectMagicNumberException;
 import com.rpc.lrpc.message.*;
+import com.rpc.lrpc.message.Content.Broadcast.BroadMassageContent;
+import com.rpc.lrpc.message.Content.Broadcast.DeleteContent;
+import com.rpc.lrpc.message.Content.Broadcast.PushContent;
 import com.rpc.lrpc.message.Content.Request.*;
 import com.rpc.lrpc.message.Content.Response.ResponseContent;
 import io.netty.buffer.ByteBuf;
@@ -35,6 +38,47 @@ public class MessageUtil {
     public static final String SEQ_COUNTER_NAME ="SeqCounter";
 
     /**
+     * 将内容为字符串类型的Message转换为广播类型的Message
+     * @param msg 字符串类型的Message
+     * @return 广播类型的Message
+     * @throws JsonProcessingException 序列化异常
+     */
+    public static BroadcastMessage<? extends BroadMassageContent> defaultMessageToBroadcastMessage(DefaultMessage msg) throws JsonProcessingException {
+        String content = msg.content();
+        if (msg.getCommandType().equals(CommandType.Push)) {
+            PushContent pushContent = new ObjectMapper().readValue(content, PushContent.class);
+            return new BroadcastMessage<>(CommandType.Push, MessageType.broadcast, pushContent);
+        }else if (msg.getCommandType().equals(CommandType.Delete)){
+            DeleteContent deleteContent = new ObjectMapper().readValue(content, DeleteContent.class);
+            return new BroadcastMessage<>(CommandType.Delete, MessageType.broadcast, deleteContent);
+        }
+        throw new RuntimeException("not match type of this Message");
+    }
+
+
+    /**
+     * 将广播消息直接转换为字节流
+     * @param message 广播消息本体，该消息的序号为0
+     * @param buf 字节流对象
+     */
+    public static void broadcastMessageToBuffer(BroadcastMessage<? extends BroadMassageContent> message,ByteBuf buf) throws JsonProcessingException {
+        message.setSeq(0);
+        BroadMassageContent content = message.content();
+        String s = new ObjectMapper().writeValueAsString(content);
+        DefaultMessage defaultMessage = new DefaultMessage(
+                message.getMagicNumber(),
+                message.getVersion(),
+                message.getSerializableType(),
+                message.getCommandType(),
+                s.getBytes(StandardCharsets.UTF_8).length,
+                message.getSeq(),
+                message.getMessageType(),
+                s
+        );
+        MessageUtil.messageToByteBuf(defaultMessage,buf);
+    }
+
+    /**
      * 字符串反序列化并转换为RequestMessage
      * @param msg 内容为字符串类型的Message,
      * @return 内容为字符串序列化后的Message
@@ -55,12 +99,6 @@ public class MessageUtil {
         }else if (msg.getCommandType().equals(CommandType.Pull)){
             content = (DefaultPullServicesRequest)
                     new ObjectMapper().readValue(msg.content(), CommandType.requestTypeClass[msg.getCommandType().getValue()]);
-        }else if (msg.getCommandType().equals(CommandType.Push)){
-            content = (DefaultPushServicesRequest)
-                    new ObjectMapper().readValue(msg.content(), CommandType.requestTypeClass[msg.getCommandType().getValue()]);
-        }else if (msg.getCommandType().equals(CommandType.Delete)){
-            content = (DefaultDeleteServiceRequest)
-                    new ObjectMapper().readValue(msg.content(), CommandType.requestTypeClass[msg.getCommandType().getValue()]);
         }
         return new RequestMessage<>(
                 msg.getMagicNumber(),
@@ -80,7 +118,7 @@ public class MessageUtil {
      * @return 原生RequestContent转换为字符串后的请求
      * @throws JsonProcessingException JSON异常
      */
-    public static DefaultMessage requestToDefaultMessage(RequestMessage<RequestContent> request) throws JsonProcessingException {
+    public static DefaultMessage requestToDefaultMessage(RequestMessage<? extends RequestContent> request) throws JsonProcessingException {
         String content = new ObjectMapper().writeValueAsString(request.content());
         return new DefaultMessage(
                 request.getMagicNumber(),
@@ -132,7 +170,12 @@ public class MessageUtil {
 
     }
 
-    //魔数（4）-版本号（1）-序列化算法（1）-消息类型（1）-指令类型(1)-请求序号(4)-正文长度(4)-消息本体
+
+    /**
+     *  魔数（4）-版本号（1）-序列化算法（1）-消息类型（1）-指令类型(1)-请求序号(4)-正文长度(4)-消息本体
+      * @param message 消息本体
+     * @param buffer 字节流对象
+     */
     public static void messageToByteBuf(Message message, ByteBuf buffer)
     {
         buffer.writeBytes(message.getMagicNumber().getBytes(StandardCharsets.UTF_8));
@@ -234,6 +277,8 @@ public class MessageUtil {
         String port=split[1];
         return new RpcAddress(host,Integer.parseInt(port));
     }
+
+
 
 
 

@@ -35,6 +35,8 @@ public class PullServicesRequestHandler extends SimpleChannelInboundHandler<Requ
     public boolean acceptInboundMessage(Object msg) throws Exception {
         return super.acceptInboundMessage(msg) && ((Message) msg).getCommandType().equals(CommandType.Pull);
     }
+
+
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, RequestMessage<PullServicesRequest> msg) throws Exception {
         PullServicesResponse response = new DefaultPullServicesResponse();

@@ -71,7 +71,6 @@ public class Client implements Closeable {
         int seq = seqCounter.getAndIncrement();
         message.setSeq(seq);
         channel.writeAndFlush(message);
-
         return workerGroup.submit(() -> responseMap.lockAndGetResponse(seq, timeout));
     }
 

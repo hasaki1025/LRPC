@@ -1,7 +1,7 @@
 package com.rpc.lrpc.Enums;
 
 public enum MessageType {
-    request(0),response(1);
+    request(0),response(1),broadcast(2);
     private int value;
 
     MessageType(int i) {
@@ -12,7 +12,7 @@ public enum MessageType {
         return value;
     }
 
-    private final static MessageType[] messageTypes={request,response};
+    private final static MessageType[] messageTypes={request,response,broadcast};
 
     public static MessageType forInt(int i)
     {

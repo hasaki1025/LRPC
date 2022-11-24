@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-
+@Slf4j
 public class RpcClientChannelInitializer extends ChannelInitializer<Channel> {
 
 
@@ -31,12 +31,10 @@ public class RpcClientChannelInitializer extends ChannelInitializer<Channel> {
 
     @Override
     protected void initChannel(Channel ch) throws Exception {
-        ChannelPipeline pipeline = ch.pipeline();
-        pipeline.addLast(
-                new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE,12,4,0,0));
-        pipeline.addLast(new LoggingHandler(LogLevel.INFO));
-        pipeline.addLast(handlersChain.toArray(new ChannelHandler[0]));
+        ch.pipeline().addLast(new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE,12,4,0,0));
+        ch.pipeline().addLast(handlersChain.toArray(new ChannelHandler[0]));
         //设置计数器
+        log.info("connect from [{}] to [{}]",ch.localAddress(),ch.remoteAddress());
         ch.attr(AttributeKey.valueOf(MessageUtil.SEQ_COUNTER_NAME)).set(new AtomicInteger(1));
         ch.attr(AttributeKey.valueOf(MessageUtil.CHANNEL_RESPONSE_MAP)).set(new ChannelResponse());
     }

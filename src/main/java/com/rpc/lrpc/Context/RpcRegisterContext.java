@@ -2,8 +2,9 @@ package com.rpc.lrpc.Context;
 
 import com.rpc.lrpc.Enums.CommandType;
 import com.rpc.lrpc.Enums.MessageType;
-import com.rpc.lrpc.message.Content.Request.DefaultPushServicesRequest;
-import com.rpc.lrpc.message.Content.Request.PushServicesRequest;
+import com.rpc.lrpc.message.BroadcastMessage;
+import com.rpc.lrpc.message.Content.Broadcast.DeleteContent;
+import com.rpc.lrpc.message.Content.Broadcast.PushContent;
 import com.rpc.lrpc.message.RequestMessage;
 import com.rpc.lrpc.message.RpcService;
 import com.rpc.lrpc.message.RpcAddress;
@@ -52,11 +53,10 @@ public class RpcRegisterContext implements RpcRegister {
         }
         dokiDokiMap.addUrl(rpcAddress);
         addressSet.add(rpcAddress);
-        //发送广播
-        DefaultPushServicesRequest request = new DefaultPushServicesRequest();
-        request.setRpcService(service);
-        request.setRpcAddress(rpcAddress);
-        Server.broadcastMessage(new RequestMessage<PushServicesRequest>(CommandType.Push, MessageType.request,request));
+        PushContent content = new PushContent();
+        content.setRpcService(service);
+        content.setRpcAddress(rpcAddress);
+        Server.broadcastMessage(new BroadcastMessage<>(CommandType.Push, MessageType.broadcast, content));
     }
 
     @Override
@@ -100,10 +100,8 @@ public class RpcRegisterContext implements RpcRegister {
             list.remove(rpcAddress);
             rpcServiceMap.put(service,list.toArray(new RpcAddress[0]));
         }
-        DefaultPushServicesRequest request = new DefaultPushServicesRequest();
-        request.setRpcAddress(rpcAddress);
-        request.setRpcService(service);
-        Server.broadcastMessage(new RequestMessage<PushServicesRequest>(CommandType.Push,MessageType.request,request));
+        DeleteContent content = new DeleteContent(rpcAddress);
+        Server.broadcastMessage(new BroadcastMessage<>(CommandType.Delete, MessageType.broadcast, content));
     }
 
 

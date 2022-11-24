@@ -7,6 +7,7 @@ RPC:
     RequestTimeOut: 10000
     ChannelType: NIO
     LoadBalancePolicy: com.rpc.lrpc.LoadBalance.RoundRobin
+    loggingLevel: DEBUG
   Provider:
     port: 8080
     ServiceName: nihao

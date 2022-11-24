@@ -11,12 +11,15 @@ import com.rpc.lrpc.message.RequestMessage;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.DefaultEventLoopGroup;
 import io.netty.channel.EventLoopGroup;
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
+import io.netty.handler.logging.LoggingHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -28,6 +31,8 @@ public class ConsumerToRegisterClient extends Client{
     private boolean isInit=false;
     @Autowired
     RpcConsumer rpcConsumer;
+    @Autowired
+    LoggingHandler loggingHandler;
 
     public void init() throws ExecutionException, InterruptedException {
         if (!isInit)

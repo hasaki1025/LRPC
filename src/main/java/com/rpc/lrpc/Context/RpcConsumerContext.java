@@ -93,7 +93,21 @@ public class RpcConsumerContext implements RpcConsumer {
 
     @Override
     public RpcAddress getRpcAddress(String serviceName) {
-        return loadBalanceMap.get(serviceName).getNext(addressMap.get(serviceName));
+        LoadBalancePolicy policy = loadBalanceMap.get(serviceName);
+        if (policy == null)
+        {
+            return null;
+        }
+
+        return policy.getNext(addressMap.get(serviceName));
+    }
+
+    @Value("${RPC.Config.ChannelType}")
+    String channelType;
+
+    @Override
+    public String getChannelType() {
+        return channelType;
     }
 
     @Value("${RPC.Config.ChannelType}")

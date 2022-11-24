@@ -7,12 +7,15 @@ import com.rpc.lrpc.message.RpcAddress;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.DefaultEventLoopGroup;
 import io.netty.channel.EventLoopGroup;
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
+import io.netty.handler.logging.LoggingHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 @Component
@@ -67,7 +70,6 @@ public class ConsumerChannelPool {
             if (client!=null) {
                 return client;
             }
-
             ConsumerToProviderClient consumerToProviderClient = new ConsumerToProviderClient(group, defaultEventLoopGroup, handlers, requestTimeOut);
             //连接初始化
             RpcAddress url = MessageUtil.parseAddress(address);

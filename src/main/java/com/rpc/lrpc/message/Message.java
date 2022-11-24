@@ -16,5 +16,7 @@ public interface Message {
     Object content();
     int getSeq();
 
+    void setSeq(int seq);
+
 
 }

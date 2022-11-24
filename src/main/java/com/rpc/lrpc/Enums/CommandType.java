@@ -1,5 +1,7 @@
 package com.rpc.lrpc.Enums;
 
+import com.rpc.lrpc.message.Content.Broadcast.DeleteContent;
+import com.rpc.lrpc.message.Content.Broadcast.PushContent;
 import com.rpc.lrpc.message.Content.Request.*;
 import com.rpc.lrpc.message.Content.Response.*;
 
@@ -12,8 +14,8 @@ public enum CommandType {
             DefaultRegisterRequest.class,
             DefaultPullServicesRequest.class,
             DokiDokiRequest.class,
-            DefaultPushServicesRequest.class,
-            DefaultDeleteServiceRequest.class,
+            PushContent.class,
+            DeleteContent.class,
     };
 
 

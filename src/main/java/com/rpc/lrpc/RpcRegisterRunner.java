@@ -1,5 +1,6 @@
 package com.rpc.lrpc;
 
+import com.rpc.lrpc.Context.RpcRegister;
 import com.rpc.lrpc.net.RegisterServer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,9 +10,10 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
 
-@ConditionalOnBean(RegisterServer.class)
-@Configuration
+@ConditionalOnBean(RpcRegister.class)
+@Component
 @ComponentScan("com.rpc.lrpc")
 @Slf4j
 @Order(1)

@@ -1,13 +1,7 @@
 package com.rpc.lrpc.net;
 
 import com.rpc.lrpc.Context.RpcRegister;
-import com.rpc.lrpc.Enums.CommandType;
-import com.rpc.lrpc.Enums.MessageType;
-import com.rpc.lrpc.message.Content.Request.DefaultDeleteServiceRequest;
-import com.rpc.lrpc.message.Content.Request.DeleteServiceRequest;
-import com.rpc.lrpc.message.RequestMessage;
 import com.rpc.lrpc.message.RpcAddress;
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.DefaultEventLoopGroup;
 import lombok.extern.slf4j.Slf4j;
@@ -58,11 +52,7 @@ public class RegisterServer extends Server{
             for (RpcAddress url : register.getAllUrl()) {
                 if (!dokiDokiMap.checkUrlIsExpire(url)) {
                     register.removeAddress(url);
-                    if (url.getServiceName()!=null && !"".equals(url.getServiceName()))
-                    {
-                        DefaultDeleteServiceRequest request = new DefaultDeleteServiceRequest(url);
-                        Server.broadcastMessage(new RequestMessage<DeleteServiceRequest>(CommandType.Delete, MessageType.request,request));
-                    }
+
                 }
             }
         },0,heartCheckTime, TimeUnit.SECONDS);

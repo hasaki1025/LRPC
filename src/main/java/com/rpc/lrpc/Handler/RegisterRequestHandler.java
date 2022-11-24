@@ -4,15 +4,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.rpc.lrpc.Context.RpcRegister;
 import com.rpc.lrpc.Enums.CommandType;
 import com.rpc.lrpc.Enums.MessageType;
-import com.rpc.lrpc.message.Content.Request.DefaultPushServicesRequest;
-import com.rpc.lrpc.message.Content.Request.PushServicesRequest;
+import com.rpc.lrpc.message.*;
 import com.rpc.lrpc.message.Content.Request.RegisterRequest;
 import com.rpc.lrpc.message.Content.Response.SimpleResponse;
-import com.rpc.lrpc.message.Message;
-import com.rpc.lrpc.message.RequestMessage;
-import com.rpc.lrpc.message.ResponseMessage;
-import com.rpc.lrpc.net.DokiDokiMap;
-import com.rpc.lrpc.net.RegisterServer;
+import com.rpc.lrpc.net.Server;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.DefaultEventLoopGroup;
@@ -47,7 +42,9 @@ public class RegisterRequestHandler extends SimpleChannelInboundHandler<RequestM
     protected void channelRead0(ChannelHandlerContext ctx, RequestMessage<RegisterRequest> msg) throws JsonProcessingException {
         SimpleResponse response = new SimpleResponse();
         try {
-            rpcRegister.registerService(msg.content().getRpcService(),msg.content().getRpcAddress());
+            RpcService service = msg.content().getRpcService();
+            RpcAddress rpcAddress = msg.content().getRpcAddress();
+            rpcRegister.registerService(service, rpcAddress);
         }catch (Exception e)
         {
             e.printStackTrace();
