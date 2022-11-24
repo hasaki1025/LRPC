@@ -10,10 +10,13 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
+
 @ConditionalOnBean(RPCRequestSender.class)
 @Configuration
 @ComponentScan("com.rpc.lrpc")
 @Slf4j
+@Order(3)
 public class RpcConsumerRunner implements ApplicationRunner {
     @Autowired
     RPCRequestSender sender;

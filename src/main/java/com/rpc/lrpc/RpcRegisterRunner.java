@@ -8,10 +8,13 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
+
 @ConditionalOnBean(RegisterServer.class)
 @Configuration
 @ComponentScan("com.rpc.lrpc")
 @Slf4j
+@Order(1)
 public class RpcRegisterRunner implements ApplicationRunner {
 
     @Autowired

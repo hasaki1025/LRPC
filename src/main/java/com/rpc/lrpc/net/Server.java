@@ -76,12 +76,6 @@ public class Server implements Closeable {
         catch (Exception e)
         {
             e.printStackTrace();
-        }finally {
-            try {
-                close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
 
     }
