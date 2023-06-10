@@ -8,8 +8,6 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 //TODO 是否需要添加条件注解
@@ -17,7 +15,7 @@ import org.springframework.stereotype.Component;
 @ChannelHandler.Sharable
 @Slf4j
 @Order(4)
-public class SimpleResonseHandler extends SimpleChannelInboundHandler<ResponseMessage<SimpleResponse>> {
+public class SimpleResponseHandler extends SimpleChannelInboundHandler<ResponseMessage<SimpleResponse>> {
 
 
     @Override

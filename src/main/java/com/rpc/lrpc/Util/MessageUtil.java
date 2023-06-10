@@ -132,7 +132,10 @@ public class MessageUtil {
         );
     }
 
-    //魔数（4）-版本号（1）-序列化算法（1）-消息类型（1）-指令类型(1)-请求序号(4)-正文长度(4)-消息本体
+    /**
+     * 协议：
+     * 魔数（4）-版本号（1）-序列化算法（1）-消息类型（1）-指令类型(1)-请求序号(4)-正文长度(4)-消息本体
+     */
     public static Message byteToMessage(ByteBuf buf) throws IncorrectMagicNumberException {
         byte[] mn = new byte[4];
         buf.readBytes(mn);
