@@ -10,7 +10,7 @@ import java.util.*;
 import static java.lang.Thread.sleep;
 
 @SpringBootTest
-public class LRpcApplicationTests {
+public class LRPCApplicationTests {
 
 
 
