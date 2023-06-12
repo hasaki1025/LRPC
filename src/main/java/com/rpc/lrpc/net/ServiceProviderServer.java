@@ -6,6 +6,7 @@ import io.netty.channel.ChannelHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -17,11 +18,14 @@ public class ServiceProviderServer extends Server{
     @Value("${RPC.Provider.port}")
     int port;
 
-    private boolean isInit=false;
+    private volatile boolean isInit=false;
 
 
     @Autowired
     List<ChannelHandler> channelHandlers;
+
+
+
 
 
     public void init() {

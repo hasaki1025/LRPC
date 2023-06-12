@@ -25,6 +25,14 @@ public class RpcCallRequestSender {
     ConsumerToRegisterClient client;
 
 
+    /**
+     *
+     * @param url,基本格式为rpc://服务名称:mapping
+     * @param resultType 设置返回类型
+     * @param params 请求参数
+     * @return 返回远程调用的结果
+     * @param <T> 根据resultType确定
+     */
     public <T> Optional<T> callSync(String url,Class<T> resultType,Object...params) {
         RpcUrl rpcUrl = MessageUtil.parseUrl(url);
         String serviceName = rpcUrl.getAddress().getServiceName();

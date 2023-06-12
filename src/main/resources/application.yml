@@ -12,14 +12,14 @@ RPC:
     ChannelType: NIO
     LoadBalancePolicy: com.rpc.lrpc.LoadBalance.RoundRobin
     loggingLevel: INFO
-  Provider:
-    port: 8080
-    ServiceName: nihao
-  Server:
-    Host: 127.0.0.1
-    port: 80
-  Register:
-    port: 80
-
+  #Provider: #服务提供者配置启动端口和服务名称
+  #  port: 8080
+  #  ServiceName: nihao
+  #Server:
+  #  Host: 127.0.0.1 #消费者配置注册中心地址
+  #  port: 80
+  #Register: #注册中心配置启动端口
+  #  port: 80
+#
 
 

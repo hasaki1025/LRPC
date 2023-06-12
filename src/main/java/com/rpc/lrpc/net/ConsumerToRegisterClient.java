@@ -24,7 +24,7 @@ import java.util.concurrent.ExecutionException;
 @Slf4j
 public class ConsumerToRegisterClient extends Client{
 
-    private boolean isInit=false;
+    private volatile boolean isInit=false;
     @Autowired
     RpcConsumer rpcConsumer;
     @Autowired

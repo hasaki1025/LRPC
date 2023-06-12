@@ -9,9 +9,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -21,7 +24,7 @@ public class RegisterServer extends Server{
 
     @Value("${RPC.Register.port}")
     int port;
-    private boolean isInit=false;
+    private volatile boolean isInit=false;
     @Autowired
     List<ChannelHandler> channelHandlers;
     @Autowired
@@ -63,5 +66,7 @@ public class RegisterServer extends Server{
 
         },0,heartCheckTime, TimeUnit.SECONDS);
     }
+
+
 
 }

@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
 @Component
 @Slf4j
 public class ProviderClient extends Client {
-    private boolean isInit=false;
+    private volatile boolean isInit=false;
 
 
     @Autowired

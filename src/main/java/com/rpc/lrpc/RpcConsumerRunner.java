@@ -30,4 +30,6 @@ public class RpcConsumerRunner implements ApplicationRunner {
         client.init();
         log.info("Consumer init....");
     }
+
+
 }
