@@ -44,8 +44,9 @@ public class PullServicesResponseHandler extends SimpleChannelInboundHandler<Res
         rpcConsumer.addServices(content.getAddressMap(),content.getMappingMap());
         Attribute<Object> attr = ctx.channel().attr(AttributeKey.valueOf(MessageUtil.CHANNEL_RESPONSE_MAP));
         ChannelResponse responseMap = (ChannelResponse) attr.get();
-        log.info("get Pull Response");
-        responseMap.putResponse(msg.getSeq(), content);
+        int seq = msg.getSeq();
+        responseMap.getResponseAction(seq).action();
+        responseMap.removeResponseAction(seq);
     }
 
 

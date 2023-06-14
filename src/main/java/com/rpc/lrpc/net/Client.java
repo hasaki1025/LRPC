@@ -64,15 +64,36 @@ public class Client implements Closeable {
         });
     }
 
-    protected Future<ResponseContent> sendMessage(RequestMessage<? extends RequestContent> message) {
+
+    /**
+     * 发送消息的基本方法,如果action中含有consumer则采用异步执行
+     * @param message 消息
+     */
+    protected int sendMessageAsyn(RequestMessage<? extends RequestContent> message,ResponseAction action)
+    {
         AtomicInteger seqCounter = (AtomicInteger) channel.attr(AttributeKey.valueOf(MessageUtil.SEQ_COUNTER_NAME)).get();
-        ChannelResponse responseMap = (ChannelResponse) channel.attr(AttributeKey.valueOf(MessageUtil.CHANNEL_RESPONSE_MAP)).get();
         //在这里已经设置了SEQ，之后无需再次设置
         int seq = seqCounter.getAndIncrement();
         message.setSeq(seq);
+        ChannelResponse responseMap = (ChannelResponse) channel.attr(AttributeKey.valueOf(MessageUtil.CHANNEL_RESPONSE_MAP)).get();
+        responseMap.addWaitRequest(seq,action);
         channel.writeAndFlush(message);
+        return seq;
+    }
+
+    /**
+     * 同步发送消息
+     * @param message 消息
+     * @return 返回一个future用来表示请求的结果
+     */
+    protected Future<ResponseContent> sendMessageSync(RequestMessage<? extends RequestContent> message) {
+        //同步发送
+        int seq = sendMessageAsyn(message,new CallResponseAction<>());
+        ChannelResponse responseMap = (ChannelResponse) channel.attr(AttributeKey.valueOf(MessageUtil.CHANNEL_RESPONSE_MAP)).get();
         return workerGroup.submit(() -> responseMap.lockAndGetResponse(seq, timeout));
     }
+
+
 
 
 

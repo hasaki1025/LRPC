@@ -26,20 +26,19 @@ public class ConsumerToProviderClient extends Client {
         request.setMapping(mapping);
         RequestMessage<CallServicesRequest> message =
                 new RequestMessage<>(CommandType.Call, MessageType.request, request);
-        CallServicesResponse content = (CallServicesResponse) sendMessage(message).get();
+        CallServicesResponse content = (CallServicesResponse) sendMessageSync(message).get();
         return content.hasException() ? Optional.empty(): Optional.of(content.getResult());
     }
 
-    public<T> void call(Object[] params, String mapping, Consumer<T> consumer)
+    public<T> void callAsyn(Object[] params, String mapping, Consumer<T> consumer)
     {
         CallServicesRequest request = new CallServicesRequest();
         request.setParamValues(params);
         request.setMapping(mapping);
         RequestMessage<CallServicesRequest> message = new RequestMessage<>(CommandType.Call, MessageType.request, request);
-        sendMessage(message).addListener(future -> {
-            CallServicesResponse content = (CallServicesResponse) future.get();
-            consumer.accept((T) content.getResult());
-        });
+        CallResponseAction<T> action = new CallResponseAction<>();
+        action.setConsumer(consumer);
+        sendMessageAsyn(message,action);
     }
 
 }

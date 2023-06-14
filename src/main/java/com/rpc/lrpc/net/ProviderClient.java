@@ -56,8 +56,12 @@ public class ProviderClient extends Client {
         request.setRpcService(provider.getRpcService());
         request.setRpcAddress(provider.getRpcUrl());
         //TODO 当发送了注册请求后，注册中心并没有那么快收到，但是服务消费者在此之前发送了一个PULL服务列表的请求，并发起了一个Call服务请求,但是服务消费者并没有保存该服务的地址
-        sendMessage(new RequestMessage<RegisterRequest>(CommandType.Register, MessageType.request, request))
-                .addListener(future -> log.info("register successfullty..."));
+        sendMessageAsyn(new RequestMessage<>(CommandType.Register, MessageType.request, request),new ResponseAction(){
+            @Override
+            public void action() {
+                log.info("register successfullty...");
+            }
+        });
     }
 
 }

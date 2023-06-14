@@ -48,7 +48,12 @@ public class ConsumerToRegisterClient extends Client{
     public void pull() throws ExecutionException, InterruptedException {
         PullServicesRequest request = new PullServicesRequest();
         RequestMessage<PullServicesRequest> message = new RequestMessage<>(CommandType.Pull, MessageType.request, request);
-        sendMessage(message).get();
+        sendMessageAsyn(message,new ResponseAction(){
+            @Override
+            public void action() {
+                log.info("get pull response");
+            }
+        });
     }
 
 

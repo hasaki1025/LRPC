@@ -85,6 +85,6 @@ public class RpcCallRequestSender {
             throw new RuntimeException("Call Service["+serviceName+"] Request fail..");
         }
         ConsumerToProviderClient connection = pool.getConsumerConnection(rpcAddress.toString());
-        connection.call(params, mapping,consumer);
+        connection.callAsyn(params, mapping,consumer);
     }
 }

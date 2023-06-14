@@ -14,8 +14,6 @@ import io.netty.handler.codec.MessageToMessageCodec;
 import io.netty.util.Attribute;
 import io.netty.util.AttributeKey;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -36,7 +34,7 @@ public class MessageCodec extends MessageToMessageCodec<ByteBuf,DefaultMessage> 
         if (msg.getMessageType().equals(MessageType.request)
                 && !msg.getCommandType().equals(CommandType.DokiDoki))
         {
-            //需要等待的响应
+            //只有Request需要响应
             //心跳发送不需要响应
             Attribute<Object> attr = ctx.channel().attr(AttributeKey.valueOf(MessageUtil.CHANNEL_RESPONSE_MAP));
             ChannelResponse channelResponse = (ChannelResponse) attr.get();
@@ -54,10 +52,10 @@ public class MessageCodec extends MessageToMessageCodec<ByteBuf,DefaultMessage> 
             {
                 ChannelResponse responseMap = (ChannelResponse) ctx.channel().attr(AttributeKey.valueOf(MessageUtil.CHANNEL_RESPONSE_MAP)).get();
                 //序号检查
-                if (!responseMap.stillWaiting(message.getSeq())) {
+                int seq = message.getSeq();
+                if (!responseMap.stillWaiting(seq)) {
                     throw new RuntimeException("not match Request of this Response");
                 }
-                responseMap.addWaitRequest(message.getSeq());
             }
             out.add(message);
         } catch (IncorrectMagicNumberException e) {
