@@ -16,6 +16,7 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
@@ -78,6 +79,7 @@ public class Client implements Closeable {
         ChannelResponse responseMap = (ChannelResponse) channel.attr(AttributeKey.valueOf(MessageUtil.CHANNEL_RESPONSE_MAP)).get();
         responseMap.addWaitRequest(seq,action);
         channel.writeAndFlush(message);
+        startExpireTask(seq,channel);
         return seq;
     }
 
@@ -90,7 +92,17 @@ public class Client implements Closeable {
         //同步发送
         int seq = sendMessageAsyn(message,new CallResponseAction<>());
         ChannelResponse responseMap = (ChannelResponse) channel.attr(AttributeKey.valueOf(MessageUtil.CHANNEL_RESPONSE_MAP)).get();
+        //同步请求无需启动延时监听
         return workerGroup.submit(() -> responseMap.lockAndGetResponse(seq, timeout));
+    }
+
+
+
+
+    private Future<?> startExpireTask(int seq,Channel channel)
+    {
+        ExpireTask task = new ExpireTask(channel, seq);
+        return workerGroup.schedule(task, timeout, TimeUnit.MILLISECONDS);
     }
 
 

@@ -47,7 +47,7 @@ public class ChannelResponse {
     }
 
     /**
-     * 新增等待请求
+     * 新增等待请求,如果该请求已经在map中则取消添加
      * @param seq 请求序号
      */
     public void addWaitRequest(int seq)
