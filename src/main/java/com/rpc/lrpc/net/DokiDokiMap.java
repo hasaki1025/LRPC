@@ -11,6 +11,9 @@ import java.util.concurrent.ConcurrentHashMap;
 @ConditionalOnBean(RpcRegister.class)
 public class DokiDokiMap {
 
+    /**
+     * 记录上次收到从指定URL心跳信息的时间
+     */
     private final ConcurrentHashMap<RpcAddress, Long> dokodoki=new ConcurrentHashMap<>();
 
 

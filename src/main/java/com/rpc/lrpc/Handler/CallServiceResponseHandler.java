@@ -55,6 +55,9 @@ public class CallServiceResponseHandler extends SimpleChannelInboundHandler<Resp
                     action.setContent(msg.content());
                     threadPool.submit(action::action);
                 }
+                else {
+                    mapResponse.putResponseContent(seq,msg.content());
+                }
                 mapResponse.removeResponseAction(seq);
             }
         } catch (Exception e)

@@ -57,7 +57,7 @@ public class ChannelResponse {
 
     public void addWaitRequest(int seq,ResponseAction action)
     {
-        waitingMap.putIfAbsent(seq,new ResponseAction());
+        waitingMap.putIfAbsent(seq,action);
     }
 
     /**

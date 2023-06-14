@@ -66,7 +66,7 @@ public class Client implements Closeable {
 
 
     /**
-     * 发送消息的基本方法,如果action中含有consumer则采用异步执行
+     * 发送消息的基本方法,默认采用异步执行
      * @param message 消息
      */
     protected int sendMessageAsyn(RequestMessage<? extends RequestContent> message,ResponseAction action)
@@ -92,6 +92,10 @@ public class Client implements Closeable {
         ChannelResponse responseMap = (ChannelResponse) channel.attr(AttributeKey.valueOf(MessageUtil.CHANNEL_RESPONSE_MAP)).get();
         return workerGroup.submit(() -> responseMap.lockAndGetResponse(seq, timeout));
     }
+
+
+
+
 
 
 
