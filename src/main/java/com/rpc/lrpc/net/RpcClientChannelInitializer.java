@@ -16,11 +16,16 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * Client信道初始化类
+ */
 @Slf4j
 public class RpcClientChannelInitializer extends ChannelInitializer<Channel> {
 
 
-
+    /**
+     * 注入的处理器链
+     */
     List<ChannelHandler> handlersChain;
 
 
@@ -29,6 +34,11 @@ public class RpcClientChannelInitializer extends ChannelInitializer<Channel> {
         this.handlersChain = handlersChain;
     }
 
+    /**
+     * 初始化信道
+     * @param ch 信道
+     * @throws Exception 父类异常抛出
+     */
     @Override
     protected void initChannel(Channel ch) throws Exception {
         ch.pipeline().addLast(new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE,12,4,0,0));

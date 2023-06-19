@@ -12,6 +12,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+/**
+ * server信道初始化类
+ */
 @Slf4j
 public class RpcServerChannelInitializer extends ChannelInitializer<Channel> {
 
@@ -25,6 +28,11 @@ public class RpcServerChannelInitializer extends ChannelInitializer<Channel> {
         this.handlersChain = handlersChain;
     }
 
+    /**
+     * 初始化server信道
+     * @param ch 信道餐宿
+     * @throws Exception 异常
+     */
     @Override
     protected void initChannel(Channel ch) throws Exception {
         ChannelPipeline pipeline = ch.pipeline();

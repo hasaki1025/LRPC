@@ -17,6 +17,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Server的注册中心实现
+ */
 @Slf4j
 @Component
 @ConditionalOnBean(RpcRegister.class)
@@ -36,6 +39,10 @@ public class RegisterServer extends Server{
     @Autowired
     RpcRegister register;
     RpcRegisterServerChannelInitializer rpcRegisterServerChannelInitializer;
+
+    /**
+     * 执行初始化方法，主要是RpcRegisterServerChannelInitializer配置handler
+     */
     public void init()
     {
         if (!isInit)
@@ -46,11 +53,17 @@ public class RegisterServer extends Server{
         }
     }
 
+    /**
+     * 执行server初始化方法
+     */
     @Override
     protected void serverChannelInit() {
         enableDokiDokiCheck();
     }
 
+    /**
+     * 心跳检测开启
+     */
     private void enableDokiDokiCheck() {
         workerGroup.scheduleAtFixedRate(()->{
             List<RpcAddress> addressNeedRemove = new ArrayList<>();

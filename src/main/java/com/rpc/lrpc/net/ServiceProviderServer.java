@@ -11,6 +11,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+/**
+ * 服务提供者Server
+ */
 @ConditionalOnBean(RPCServiceProvider.class)
 @Component
 public class ServiceProviderServer extends Server{
@@ -25,9 +28,9 @@ public class ServiceProviderServer extends Server{
     List<ChannelHandler> channelHandlers;
 
 
-
-
-
+    /**
+     * 初始化方法
+     */
     public void init() {
         if (!isInit)
         {

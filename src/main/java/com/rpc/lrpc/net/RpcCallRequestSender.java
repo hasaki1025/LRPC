@@ -66,7 +66,13 @@ public class RpcCallRequestSender {
 
     }
 
-
+    /**
+     * 执行异步服务调用
+     * @param url 请求的服务地址
+     * @param consumer 接受到请求的响应处理
+     * @param params 请求参数
+     * @param <T> 请求返回类型
+     */
     public<T> void call(String url, Consumer<T> consumer, Object...params) {
         RpcUrl rpcUrl = MessageUtil.parseUrl(url);
         String serviceName = rpcUrl.getAddress().getServiceName();
