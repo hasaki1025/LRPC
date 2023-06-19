@@ -12,6 +12,9 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 
+/**
+ * RpcConsumer基本实现类,基于配置自动注入
+ */
 @Data
 @ConditionalOnProperty(name = {
         "RPC.Server.port","RPC.Server.Host"
@@ -29,9 +32,21 @@ public class RpcConsumerContext implements RpcConsumer {
     @Value("${RPC.Config.LoadBalancePolicy:com.rpc.lrpc.LoadBalance.RoundRobin}")
     String loadBalancePolicy;
 
+    /**
+     * 保存所有rpcServices
+     */
     private volatile Set<String> rpcServices=new CopyOnWriteArraySet<>();
+    /**
+     * 关于service和实际地址的映射
+     */
     private volatile  Map<String,RpcAddress[]> addressMap=new ConcurrentHashMap<>();
+    /**
+     * 关于service到mappings映射
+     */
     private volatile Map<String,String[]> mappingMap=new ConcurrentHashMap<>();
+    /**
+     * service对应的负载均衡策略
+     */
     private volatile Map<String, LoadBalancePolicy> loadBalanceMap=new ConcurrentHashMap<>();
 
     @Override

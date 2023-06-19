@@ -7,6 +7,10 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.ConcurrentHashMap;
+
+/**
+ * 心跳发送Map
+ */
 @Component
 @ConditionalOnBean(RpcRegister.class)
 public class DokiDokiMap {
@@ -20,6 +24,11 @@ public class DokiDokiMap {
     @Value("${RPC.Config.ExpireTime}")
     long expireTime;
 
+    /**
+     * 定时检测该服务是否过期
+     * @param url 服务URL
+     * @return 是否过期
+     */
     public boolean checkUrlIsExpire(RpcAddress url)
     {
         if (!dokodoki.containsKey(url))
@@ -36,6 +45,10 @@ public class DokiDokiMap {
         return true;
     }
 
+    /**
+     * 更新指定URL最后一次接收到心跳的时间
+     * @param url 接受到来自该url的心跳
+     */
     public void updateOrAddLastDokiTime(RpcAddress url)
     {
         if (dokodoki.containsKey(url)) {
@@ -44,6 +57,10 @@ public class DokiDokiMap {
 
     }
 
+    /**
+     * 批量新增心跳检测url
+     * @param urls url
+     */
     public void addAllUrl(RpcAddress[] urls)
     {
         for (RpcAddress url : urls) {
@@ -51,6 +68,10 @@ public class DokiDokiMap {
         }
     }
 
+    /**
+     * 新增心跳检测url
+     * @param url 新增的URL
+     */
     public void addUrl(RpcAddress url)
     {
         dokodoki.putIfAbsent(url,System.currentTimeMillis());

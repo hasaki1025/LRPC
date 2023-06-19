@@ -24,6 +24,9 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * Netty基本服务类（ServerSocket）
+ */
 @Slf4j
 public class Server implements Closeable {
 

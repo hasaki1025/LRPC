@@ -17,6 +17,9 @@ import org.springframework.stereotype.Component;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * 注册中心基本实现类,通过配置文件自动注入
+ */
 @Data
 @ConditionalOnProperty(name = {
         "RPC.Register.port"
@@ -35,7 +38,9 @@ public class RpcRegisterContext implements RpcRegister {
     final Map<String,RpcAddress[]> addressMap=new ConcurrentHashMap<>();
 
 
-
+    /**
+     * 注册中心端口
+     */
      @Value("${RPC.Register.port}")
       Integer port;
 

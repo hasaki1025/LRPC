@@ -19,10 +19,13 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-
+/**
+ * 客户端基本类
+ */
 @Slf4j
 @Getter
 public class Client implements Closeable {
+
 
 
     final EventLoopGroup group;
@@ -41,6 +44,12 @@ public class Client implements Closeable {
         this.timeout=timeout;
     }
 
+    /**
+     * netty客户端初始化
+     * @param host 连接IP地址
+     * @param port 连接端口
+     * @param channelClass 信道类型
+     */
     void init(String host, int port, Class<? extends Channel> channelClass) {
 
 
@@ -57,7 +66,10 @@ public class Client implements Closeable {
     }
 
 
-
+    /**
+     * 关闭当前连接
+     * @throws IOException 连接关闭抛出
+     */
     @Override
     public void close() throws IOException {
         channel.close().addListener((ChannelFutureListener) future -> {
@@ -97,8 +109,12 @@ public class Client implements Closeable {
     }
 
 
-
-
+    /**
+     * 启动一个过期检测任务，作用于请求发送后的超时检测
+     * @param seq 检测的请求序号
+     * @param channel 请求的信道
+     * @return future类型用于表示该请求对应的响应状态
+     */
     private Future<?> startExpireTask(int seq,Channel channel)
     {
         ExpireTask task = new ExpireTask(channel, seq);

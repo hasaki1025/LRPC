@@ -19,10 +19,16 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * 服务提供者对注册中心的Client
+ */
 @ConditionalOnBean(RPCServiceProvider.class)
 @Component
 @Slf4j
 public class ProviderClient extends Client {
+    /**
+     * 是否已初始化
+     */
     private volatile boolean isInit=false;
 
 
@@ -33,12 +39,18 @@ public class ProviderClient extends Client {
     @Autowired
     RPCServiceProvider provider;
 
+
+    /**
+     * 初始化client，主要启动心跳发送任务和执行注册任务
+     */
     public void init() {
         if (!isInit)
         {
             isInit=true;
             super.init(provider.getRegisterServerHost(), provider.getRegisterServerPort(), ChannelType.ToChannelClass(provider.getChannelType()));
+            //注册
             register();
+            //启动一个定时任务定期执行心跳发送
             workerGroup.scheduleAtFixedRate(()->{
                 DokiDokiRequest request = new DokiDokiRequest();
                 request.setRpcAddress(provider.getRpcUrl());
@@ -50,6 +62,9 @@ public class ProviderClient extends Client {
     }
 
 
+    /**
+     * 注册本地服务
+     */
     void register()
     {
         RegisterRequest request = new RegisterRequest();

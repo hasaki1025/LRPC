@@ -14,12 +14,23 @@ import org.springframework.stereotype.Component;
 import java.lang.reflect.Method;
 import java.util.HashSet;
 
+/**
+ * 扫描所有RPCController作为bean注入并保存在Context中
+ */
 @Data
 @ConditionalOnBean(RPCServiceProvider.class)
 @Component
 public class RpcServiceBeanPostProcessor implements BeanPostProcessor {
     @Autowired
     RPCServiceProvider provider;
+
+    /**
+     * 筛选符合要求的类
+     * @param bean bean实例
+     * @param beanName bean名称
+     * @return bean实例（可被修改）
+     * @throws BeansException 父类异常
+     */
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
         if (bean.getClass().isAnnotationPresent(RPCController.class))

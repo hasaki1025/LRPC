@@ -11,6 +11,10 @@ import org.springframework.context.annotation.PropertySource;
 
 import java.lang.annotation.*;
 
+/**
+ * @author YX
+ * 启用RPC功能
+ */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented

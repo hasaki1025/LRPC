@@ -27,11 +27,19 @@ public class ExpireTask implements Runnable{
         this.seq = seq;
     }
 
+    /**
+     * 获取该信道的响应Map
+     * @return ChannelResponse
+     */
     public ChannelResponse getChannelResponse()
     {
         return (ChannelResponse) channel.attr(AttributeKey.valueOf(MessageUtil.CHANNEL_RESPONSE_MAP)).get();
     }
 
+
+    /**
+     * 检测该任务绑定的请求是否已经接受到响应，如果没有视该请求已失败
+     */
     @Override
     public void run() {
         ChannelResponse response = getChannelResponse();
